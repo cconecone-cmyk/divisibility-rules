@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1e3a8a">
+<title>倍數判別法 動畫教學 🔢 幾何方塊拆解與算式推導</title>
+<meta name="description" content="國中數學《倍數判別法》幾何動態視覺化教學工具！包含 2、4、8、3、9、11、7（三位分節法）的倍數判別原理、方塊拆解與算式推導動畫演示。">
+<meta property="og:title" content="倍數判別法 動畫教學 🔢">
+<meta property="og:description" content="幾何方塊拆解與算式推導視覺化，支援 2、4、8、3、9、11、7（三位分節法）倍數判別動畫演示。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://cconecone-cmyk.github.io/divisibility-rules/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="倍數判別法 動畫教學 🔢">
+<meta name="twitter:description" content="國中數學倍數判別法幾何動態視覺化教學工具。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231e3a8a'/><text x='50' y='68' font-size='56' font-family='system-ui,sans-serif' font-weight='900' text-anchor='middle' fill='%23ffffff'>÷</text></svg>">
+<style>
+:root{--h:#2563eb;--o:#db2777;--ok:#16a34a;--bad:#dc2626;--ink:#1e293b;--mu:#64748b;--zf:1}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#eef3f8;color:var(--ink);font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+button,input{font:inherit}button{cursor:pointer;touch-action:manipulation}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;background:#eef3f8}
+header{display:flex;align-items:center;gap:8px;padding:6px 10px;background:linear-gradient(90deg,#1e3a8a,#2563eb);color:#fff;flex:none}
+.brand{font-weight:900;font-size:20px;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.brand a{color:inherit;text-decoration:none}
+.tabs{display:flex;gap:5px;flex:1;justify-content:center;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{border:0;border-radius:10px;padding:4px 16px;background:rgba(255,255,255,.18);color:#fff;font-weight:900;font-size:24px;white-space:nowrap;transition:background .2s,color .2s}
+.tabs button small{font-size:.5em;margin-left:2px}
+.tabs button.on{background:#fff;color:#1e3a8a}
+.hb{border:0;border-radius:8px;padding:6px 10px;background:rgba(255,255,255,.18);color:#fff;font-weight:800;font-size:14px;white-space:nowrap;transition:background .2s}
+.hb.on{background:#fff;color:#1e3a8a}
+.hb:hover{background:rgba(255,255,255,.28)}
+.hb.on:hover{background:#fff}
+.gh-btn{display:inline-flex;align-items:center;gap:4px;text-decoration:none;color:#fff;background:rgba(255,255,255,.18);border-radius:8px;padding:6px 10px;font-weight:800;font-size:14px;white-space:nowrap;transition:background .2s}
+.gh-btn:hover{background:rgba(255,255,255,.3)}
+.zfv{font-size:13px;font-weight:800;min-width:2.6em;text-align:center}
+.bar{display:flex;align-items:center;gap:6px;padding:6px 10px;flex:none}
+.bar input{width:5.2em;font-size:24px;font-weight:900;text-align:center;border:2px solid #94a3b8;border-radius:8px;padding:2px}
+.bar input.long{width:8.6em}
+.chip{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:5px 11px;font-weight:800;font-size:16px;white-space:nowrap;transition:transform .15s,background .15s}
+.chip:active{transform:scale(.95)}
+.chip.go{background:var(--h);color:#fff;border-color:var(--h)}
+.rule{flex:1;min-width:0;background:#fce7f3;border:2px solid #f0abcb;border-radius:10px;padding:4px 12px;font-weight:800;font-size:calc(clamp(15px,1.45vw,25px)*var(--zf));line-height:1.3}
+.rule b{color:#be185d}
+.cap{flex:none;margin:0 10px 6px;background:#fff7d6;border-left:7px solid #f59e0b;border-radius:8px;padding:4px 14px;font-weight:900;font-size:calc(clamp(17px,1.85vw,33px)*var(--zf));line-height:1.3;min-height:2.7em;display:flex;align-items:center}
+.cap .sn{color:#b45309;margin-right:.5em;white-space:nowrap}
+.stage{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:8px;padding:0 10px 6px}
+.stage.only-vis,.stage.only-eq{grid-template-columns:1fr!important;grid-template-rows:1fr!important}
+.stage.only-vis #eq,.stage.only-eq #vis{display:none}
+.panel{background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);min-height:0;min-width:0;overflow:hidden;position:relative;touch-action:none;user-select:none;-webkit-user-select:none}
+.panel.zoomed{cursor:grab;box-shadow:0 0 0 3px #f59e0b inset,0 2px 8px rgba(0,0,0,.06)}
+.zw{transform-origin:0 0;will-change:transform}
+#vis{display:flex;align-items:center;justify-content:center;padding:8px}
+#visz{width:100%}
+#eq{padding:10px 16px}
+#eqz{display:flex;flex-direction:column;gap:.12em}
+.zc{position:absolute;top:6px;right:6px;z-index:6;display:flex;gap:3px;background:rgba(255,255,255,.92);border:1px solid #cbd5e1;border-radius:10px;padding:3px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.zc button{border:0;background:#eef2f7;border-radius:7px;min-width:36px;height:34px;font-size:20px;font-weight:900;color:#1e3a8a;padding:0 7px}
+.zc button[data-a=pct]{font-size:13px;min-width:50px;background:#fff}
+.zc button.lay{font-size:14px;background:#1e3a8a;color:#fff}
+.vin{width:100%;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.8);--tc:calc(var(--u)*1.5);--L:max(calc(15px*var(--zf)),calc(var(--u)*1.3*var(--zf)))}
+.eqt{font-size:13px;color:var(--mu);font-weight:800;letter-spacing:.1em}
+.row{font-weight:900;line-height:1.35;padding:.04em .3em;border-radius:.3em;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.row.old{font-size:.74em;color:#475569}
+.row.cur{background:#fff7d6;animation:rin .45s}
+@keyframes rin{from{opacity:0;transform:translateY(8px)}}
+.ug{border-bottom:.12em solid var(--ok)}.um{border-bottom:.12em solid var(--o)}
+.tg{background:#dcfce7;border-radius:.2em;padding:0 .2em}
+.bl{color:var(--h)}.pk{color:#be185d}.okc{color:#15803d}.noc{color:#b91c1c}
+/* 方塊 */
+.blocks{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:var(--u) calc(var(--u)*1.2);width:100%}
+.part{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.3);max-width:100%}
+.pl{font-size:var(--L);font-weight:900;padding:.05em .6em;border-radius:.5em;background:#f1f5f9;white-space:nowrap}
+.pl small{font-size:.78em}
+.items{display:flex;flex-wrap:wrap;gap:calc(var(--u)*.6);justify-content:center;align-items:flex-end;max-width:100%}
+.item{display:flex;flex-direction:column;align-items:center}
+.sub,.note{font-size:var(--L);font-weight:900;white-space:nowrap;opacity:0;transition:opacity .4s}
+.note{color:#15803d}
+.split .sub,.grp .note{opacity:1}
+.plus{font-size:calc(var(--u)*2.4);font-weight:900;color:#94a3b8;align-self:center}
+.g100,.g10{display:grid;gap:max(1px,calc(var(--u)*.14));padding:calc(var(--u)*.25);border:2px solid #334155;border-radius:4px;background:#fff}
+.g100{grid-template-columns:repeat(10,var(--u))}
+.g10{grid-template-columns:var(--u)}
+.ones{display:grid;grid-template-columns:var(--u);gap:calc(var(--u)*.3);padding:calc(var(--u)*.25) 0}
+.c{width:var(--u);height:var(--u);border:max(1px,calc(var(--u)*.1)) solid #8fb0dc;border-radius:2px;background:#fff;transition:background-color .5s,border-color .5s,opacity .4s,transform .3s}
+.c.u1{background:var(--o);border-color:var(--o)}
+.split .c.lit{background:var(--lc);border-color:var(--lc)}
+.c.hole{opacity:0;border:max(1.5px,calc(var(--u)*.15)) dashed var(--bad);background:#fff}
+.split .c.hole,.why .c.hole{opacity:1}
+.grp .c[data-g]{background:var(--gc);border-color:rgba(30,41,59,.3)}
+.done .big .c:not(.lit):not(.hole){background:#e5e7eb!important;border-color:#cbd5e1!important}
+.done .big .g100,.done .big .g10{border-color:#94a3b8}
+.c.moved{background:transparent!important;border-style:dashed!important;border-color:#cbd5e1!important;animation:none!important}
+.pulse .c.lit,.pulse .c.hole{animation:pulse .45s ease-in-out 2}
+@keyframes pulse{50%{transform:scale(1.7)}}
+.cube{--cs:11;position:relative;width:calc(var(--u)*var(--cs)*1.145);height:calc(var(--u)*var(--cs));flex:none}
+.cube.sm{--cs:6}
+.cube svg{position:absolute;left:0;top:0;width:calc(var(--u)*var(--cs));height:calc(var(--u)*var(--cs));overflow:visible}
+.cube polygon,.cube rect{stroke:#334155;stroke-width:1.5;transition:fill .5s}
+.tp{fill:#dbe7fb}.sd{fill:#c7d7f3}.fr{fill:#eef4ff}
+.gl line{stroke:#94a3b8;stroke-width:.6}
+.cube rect.cn{fill:none;stroke:none}
+.split .cube.cut rect.cn{fill:#fff;stroke:#dc2626;stroke-dasharray:3 2}
+.cube .c{position:absolute;left:calc(var(--u)*var(--cs)*1.045);bottom:0}
+.cube .c.lit{opacity:0}.split .cube .c.lit{opacity:1}
+.cv{position:absolute;left:0;top:calc(var(--u)*var(--cs)*.286);width:calc(var(--u)*var(--cs)*.714);height:calc(var(--u)*var(--cs)*.714);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:calc(var(--u)*var(--cs)*.21);color:var(--cc);pointer-events:none;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff}
+.grp .big .cube .fr{fill:#fcd34d}.grp .big .cube .tp{fill:#fde68a}.grp .big .cube .sd{fill:#7dd3fc}
+.done .big .cube .fr,.done .big .cube .tp,.done .big .cube .sd{fill:#e5e7eb}
+.tw{border:3px dashed var(--o);border-radius:12px;padding:calc(var(--u)*.5);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.3);background:#fff7fb;max-width:100%}
+.twl{font-size:var(--L);font-weight:900;color:#be185d;white-space:nowrap}
+.tgr .tw .c[data-t]{background:var(--tcol);border-color:rgba(30,41,59,.35)}
+.tgr .tw .c.rm{background:#fee2e2;border-color:var(--bad);border-style:dashed}
+.zero{font-size:calc(var(--u)*2);font-weight:900;color:var(--mu)}
+.oe{visibility:hidden;display:flex;flex-wrap:wrap;gap:calc(var(--u)*.35);justify-content:center;font-size:var(--L);font-weight:900}
+.oe.show{visibility:visible;animation:pop .5s}
+.oe span{padding:.05em .45em;border-radius:.35em}
+.oe .ev{background:#dcfce7;color:#15803d}.oe .od{background:#f1f5f9;color:#64748b}
+.oe .me{outline:3px solid var(--o)}
+.tray{width:100%;border:3px dashed var(--o);border-radius:12px;background:#fff5fa;padding:calc(var(--u)*.5);display:flex;flex-direction:column;gap:calc(var(--u)*.4);align-items:center}
+.tray h4{margin:0;font-size:var(--L);color:#be185d;align-self:flex-start}
+.tray.pl1{border-color:var(--h);background:#eff6ff}.tray.pl1 h4{color:#1d4ed8}
+.tray.mi1{border-color:var(--bad);background:#fef2f2}.tray.mi1 h4{color:#b91c1c}
+.tb{display:flex;flex-wrap:wrap;gap:calc(var(--tc)*.4);justify-content:center;align-items:center;min-height:var(--tc)}
+.tk{width:var(--tc);height:var(--tc);border-radius:3px;border:2px solid var(--tkc);background:var(--tkc);transition:opacity .35s,transform .35s}
+.tk.neg{background:#fff;border:2px dashed var(--bad)}
+.gh{opacity:0!important}
+.land{animation:land .35s}
+@keyframes land{50%{transform:scale(1.35)}}
+.gb,.cb{display:grid;grid-template-columns:repeat(var(--gcols),var(--tc));gap:max(2px,calc(var(--u)*.2));padding:max(3px,calc(var(--u)*.25));border:3px solid transparent;border-radius:6px;transition:.4s}
+.grouped .gb{border-color:var(--ok);background:#dcfce7;animation:pop .45s backwards}
+.grouped .gb.rm{border-color:var(--bad);border-style:dashed;background:#fee2e2}
+@keyframes pop{from{transform:scale(.5);opacity:0}}
+.cw{display:flex;flex-direction:column;align-items:center}
+.cn2{font-size:var(--L);font-weight:800;color:var(--mu);visibility:hidden}
+.cancel .cn2{visibility:visible}
+.cancel .cb{border-color:#94a3b8;border-style:dashed}
+.cancel .cb .tk{opacity:.2;transform:scale(.75)}
+.trays{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*.8);width:100%}
+.vd{visibility:hidden;font-weight:900;font-size:max(17px,calc(var(--u)*1.7));padding:.15em .8em;border-radius:.5em;text-align:center}
+.vd.show{visibility:visible;animation:pop .5s}
+.vd.ok{background:#dcfce7;color:#15803d}.vd.no{background:#fee2e2;color:#b91c1c}
+.r7{display:flex;flex-wrap:wrap;gap:calc(var(--u)*1.6);justify-content:center;align-items:center;width:100%}
+.pcs{display:flex;gap:calc(var(--u)*.5);justify-content:center;align-items:center;flex-wrap:wrap}
+.pcw{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.3)}
+.pcl{font-size:var(--L);font-weight:800;color:var(--mu);white-space:nowrap}
+.pcn{font-size:max(26px,calc(var(--u)*3.6));font-weight:900;padding:.02em .3em;border:3px solid #94a3b8;border-radius:.25em;letter-spacing:.06em;background:#f8fafc;color:#334155;transition:all .4s;font-variant-numeric:tabular-nums}
+.s2 .pcn.pos{color:#1d4ed8;border-color:#60a5fa;background:#eff6ff}
+.s2 .pcn.neg{color:#be185d;border-color:#f0abcb;background:#fdf2f8}
+.pcn.moved{opacity:.25}
+.comma{font-size:max(26px,calc(var(--u)*3.6));font-weight:900;color:#94a3b8}
+.sg7{font-size:var(--L);font-weight:900;padding:0 .6em;border-radius:999px;visibility:hidden}
+.s2 .sg7{visibility:visible;animation:pop .45s}
+.sg7.pos{background:#dbeafe;color:#1d4ed8}.sg7.neg{background:#fce7f3;color:#be185d}
+.why{visibility:hidden;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.4)}
+.why.show{visibility:visible;animation:pop .5s}
+.wrow{display:flex;align-items:center;gap:calc(var(--u)*.8)}
+.n7l{font-size:var(--L);font-weight:900;text-align:center}
+.bd{font-size:max(22px,calc(var(--u)*2.6));font-weight:900;padding:0 .25em;border-radius:.2em;border:2px solid;font-variant-numeric:tabular-nums}
+.bd.pos{color:#1d4ed8;border-color:#60a5fa;background:#fff}.bd.neg{color:#be185d;border-color:#f0abcb;background:#fff}
+.op{font-size:max(20px,calc(var(--u)*2.2));font-weight:900;color:var(--mu)}
+.bsum{visibility:hidden;font-size:max(22px,calc(var(--u)*2.6));font-weight:900}
+.s4 .bsum{visibility:visible;animation:pop .45s}
+.re7{display:none;font-size:max(20px,calc(var(--u)*2.3));font-weight:900;text-align:center;background:#fff7d6;border:3px dashed #f59e0b;border-radius:.4em;padding:.1em .6em}
+.s45 .re7{display:block;animation:pop .5s}
+.g7{visibility:hidden;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.3)}
+.s5 .g7{visibility:visible;animation:pop .5s}
+footer{display:flex;align-items:center;gap:8px;padding:6px 10px;padding-bottom:max(6px,env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e2e8f0;flex:none}
+footer button{border:0;border-radius:10px;padding:10px 20px;font-weight:900;font-size:20px;background:#e2e8f0;color:var(--ink);transition:background .2s,opacity .2s}
+footer button:disabled{opacity:.35}
+#next{background:var(--h);color:#fff}
+#play.on{background:#f59e0b;color:#fff}
+.dots{flex:1;display:flex;justify-content:center;align-items:center;gap:9px}
+.dot{width:14px;height:14px;border-radius:50%;background:#cbd5e1;cursor:pointer;transition:.3s}
+.dot.on{background:#93c5fd}.dot.cur{background:var(--h);transform:scale(1.35)}
+.kbd{font-size:12px;color:var(--mu);white-space:nowrap}
+.toast{position:fixed;left:50%;top:14%;transform:translateX(-50%);background:#1e3a8a;color:#fff;padding:12px 18px;border-radius:10px;font-weight:800;z-index:1000;display:none;max-width:90%;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.noanim *{transition:none!important}
+body.mobile{background:#cbd5e1}
+body.mobile .app{max-width:520px;margin:0 auto;box-shadow:0 0 24px rgba(0,0,0,.2)}
+body.mobile header{flex-wrap:wrap;gap:5px;padding:5px 7px}
+body.mobile .brand{font-size:15px;flex:1}
+body.mobile .tabs{order:3;flex:1 1 100%;justify-content:flex-start}
+body.mobile .tabs button{font-size:17px;padding:3px 11px}
+body.mobile #fs{display:none}
+body.mobile .hb,body.mobile .gh-btn{padding:5px 8px;font-size:13px}
+body.mobile .bar{flex-wrap:wrap;gap:4px;padding:5px 7px}
+body.mobile .bar input{font-size:19px;width:5em}
+body.mobile .bar input.long{width:8.4em}
+body.mobile .chip{font-size:13px;padding:3px 8px}
+body.mobile .rule{flex:1 1 100%;font-size:calc(13px*var(--zf));padding:3px 8px}
+body.mobile .cap{margin:0 6px 5px;font-size:calc(15px*var(--zf));padding:3px 8px}
+body.mobile .stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1.45fr) minmax(0,1fr);padding:0 6px 5px;gap:5px}
+body.mobile .vin{--L:max(calc(11px*var(--zf)),calc(var(--u)*1.3*var(--zf)))}
+body.mobile .pcn,body.mobile .comma{font-size:max(17px,calc(var(--u)*3.6))}
+body.mobile #eq{padding:6px 10px}
+body.mobile .zc button{min-width:30px;height:30px;font-size:17px}
+body.mobile .zc button[data-a=pct]{min-width:42px;font-size:11px}
+body.mobile .zc button.lay{font-size:12px}
+body.mobile footer{gap:5px;padding:5px 7px}
+body.mobile footer button{font-size:15px;padding:9px 11px}
+body.mobile #next{flex:1.3}
+body.mobile .dots{gap:4px}
+body.mobile .dot{width:8px;height:8px}
+body.mobile .kbd{display:none}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header>
+    <div class="brand"><span>🔢</span> <a href="./" title="重設並回到首頁">倍數判別法</a></div>
+    <nav class="tabs" id="tabs"></nav>
+    <button class="hb" id="zfm" title="文字縮小">A−</button><span class="zfv" id="zfv">100%</span><button class="hb" id="zfp" title="文字放大">A＋</button>
+    <button class="hb" data-m="projector">📺 投影</button>
+    <button class="hb" data-m="mobile">📱 手機</button>
+    <button class="hb" id="fs">⛶ 全螢幕</button>
+    <a class="gh-btn" href="https://github.com/cconecone-cmyk/divisibility-rules" target="_blank" rel="noopener noreferrer" title="查看 GitHub 原始碼">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      <span>GitHub</span>
+    </a>
+  </header>
+  <div class="bar">
+    <input id="num" inputmode="numeric" maxlength="6" aria-label="輸入數字">
+    <button class="chip go" id="start">演示 ▶</button>
+    <span id="presets"></span>
+    <button class="chip" id="rand" title="隨機產生數字">🎲</button>
+    <div class="rule" id="rule"></div>
+  </div>
+  <div class="cap" id="cap"></div>
+  <main class="stage" id="stage">
+    <div class="panel" id="vis"><div class="zw" id="visz"></div><div class="zc"></div></div>
+    <div class="panel" id="eq"><div class="zw" id="eqz"></div><div class="zc"></div></div>
+  </main>
+  <footer>
+    <button id="prev">◀ 上一步</button>
+    <div class="dots" id="dots"></div>
+    <button id="play">▶ 播放</button>
+    <button id="next">下一步 ▶</button>
+    <span class="kbd">← → 翻頁｜＋ − 0 放大縮小｜G 大圖｜E 大算式｜P 播放｜F 全螢幕</span>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $=s=>document.querySelector(s);
+function h(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.innerHTML=x;return e}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const rep=(n,f)=>Array.from({length:n},(_,i)=>f(i));
+const sumd=a=>a.reduce((s,o)=>s+o.d,0);
+const COL={6:'#0d9488',5:'#ea580c',4:'#7c3aed',3:'#2563eb',2:'#16a34a',1:'#db2777'};
+const VN={4:'1000',5:'1萬',6:'10萬'};
+const A=['#fcd34d','#7dd3fc'];
+const TC=['#fcd34d','#7dd3fc','#86efac'];
+const PAL=['#fca5a5','#fdba74','#fcd34d','#bef264','#86efac','#5eead4','#7dd3fc','#a5b4fc','#f0abfc'];
+const C=(d,p)=>`<b style="color:${COL[p]}">${d}</b>`;
+let SMALL=false;
+function digs(n){const s=String(n);return s.split('').map((c,i)=>({d:+c,p:s.length-i,v:10**(s.length-i-1)}))}
+
+/* ===== 方塊元件 ===== */
+function cell(cls,gc){const c=h('div','c '+(cls||''));if(gc){c.dataset.g=1;c.style.setProperty('--gc',gc)}return c}
+function lit(color){const c=h('div','c lit');c.style.setProperty('--lc',color);return c}
+function hundred(gf,corner){const g=h('div','g100');for(let i=0;i<100;i++){const r=i/10|0,q=i%10;g.append(corner&&i===99?lit(COL[3]):cell('',gf&&gf(r,q)))}return g}
+function ten(gf,corner,hole){const g=h('div','g10');for(let i=0;i<10;i++)g.append(corner&&i===9?lit(COL[2]):cell('',gf&&gf(i)));if(hole)g.append(cell('hole'));return g}
+function ones(d){const g=h('div','ones');for(let i=0;i<d;i++)g.append(cell('u1'));return g}
+const CUBE=(()=>{let s='<svg viewBox="0 0 140 140"><polygon class="tp" points="0,40 40,0 140,0 100,40"/><polygon class="sd" points="100,40 140,0 140,100 100,140"/><rect class="fr" x="0" y="40" width="100" height="100"/><g class="gl">';
+  for(let i=10;i<100;i+=10)s+=`<line x1="${i}" y1="40" x2="${i}" y2="140"/><line x1="0" y1="${40+i}" x2="100" y2="${40+i}"/><line x1="${i}" y1="40" x2="${i+40}" y2="0"/><line x1="100" y1="${40+i}" x2="140" y2="${i}"/>`;
+  for(let j=1;j<10;j++)s+=`<line x1="${j*4}" y1="${40-j*4}" x2="${100+j*4}" y2="${40-j*4}"/><line x1="${100+j*4}" y1="${40-j*4}" x2="${100+j*4}" y2="${140-j*4}"/>`;
+  return s+'</g><rect class="cn" x="90" y="130" width="10" height="10"/></svg>'})();
+function cube(mode,p,sm=SMALL){const w=h('div','cube'+(mode==='lit'?' cut':'')+(sm?' sm':''),CUBE);const cv=h('div','cv',VN[p]);cv.style.setProperty('--cc',COL[p]);w.append(cv);
+  if(mode==='lit')w.append(lit(COL[p]));if(mode==='hole')w.append(cell('hole'));return w}
+function item(el,sub){const it=h('div','item');it.append(el);if(sub!==undefined)it.append(h('div','sub',sub||'&nbsp;'));return it}
+function part(label,items,note,big,style,sn){const p=h('div','part'+(big?' big':''));const l=h('div','pl',label);if(style)l.style.cssText=style;const w=h('div','items');items.forEach(x=>w.append(x));p.append(l,w);if(sn)p.append(h('div','sub',sn));if(note!==undefined)p.append(h('div','note',note||'&nbsp;'));return p}
+function row(parts){const b=h('div','blocks');parts.forEach((p,i)=>{if(i)b.append(h('div','plus','+'));b.append(p)});return b}
+function tray(title,cls){const t=h('div','tray '+(cls||'')),hd=h('h4',null,title),b=h('div','tb');t.append(hd,b);return{t,hd,b}}
+function tok(c){const t=h('div','tk gh'+(c==='neg'?' neg':''));if(c!=='neg')t.style.setProperty('--tkc',c);return t}
+function groups(body,list,k,cols){const tks=[];for(let i=0;i<list.length;i+=k){const g=h('div','gb'+(list.length-i<k?' rm':''));g.style.setProperty('--gcols',cols);g.style.animationDelay=Math.min(1.2,i/k*.08)+'s';list.slice(i,i+k).forEach(c=>{const t=tok(c);g.append(t);tks.push(t)});body.append(g)}return tks}
+const stl=p=>`color:${COL[p]}`;
+
+/* ===== 飛行動畫 ===== */
+function fly(pairs,dur=700){
+  pairs=pairs.filter(p=>p[0]&&p[1]);if(!pairs.length)return Promise.resolve();
+  const stg=Math.max(15,Math.min(160,1500/pairs.length));
+  return Promise.all(pairs.map(([s,t],i)=>new Promise(res=>{
+    const a=s.getBoundingClientRect(),b=t.getBoundingClientRect(),cs=getComputedStyle(s);
+    const cl=h('div','flyer');
+    Object.assign(cl.style,{position:'fixed',left:a.left+'px',top:a.top+'px',width:a.width+'px',height:a.height+'px',zIndex:999,transformOrigin:'0 0',background:cs.backgroundColor,border:`${cs.borderTopWidth} ${cs.borderTopStyle} ${cs.borderTopColor}`,borderRadius:cs.borderTopLeftRadius,pointerEvents:'none',boxSizing:'border-box'});
+    if(s.classList.contains('pcn')){cl.textContent=s.textContent;Object.assign(cl.style,{display:'flex',alignItems:'center',justifyContent:'center',color:cs.color,fontSize:cs.fontSize,fontWeight:cs.fontWeight,letterSpacing:cs.letterSpacing,fontFamily:cs.fontFamily})}
+    document.body.append(cl);
+    let done=0;const fin=()=>{if(done)return;done=1;t.classList.remove('gh');t.classList.add('land');cl.remove();res()};
+    const dx=b.left-a.left,dy=b.top-a.top,sx=b.width/a.width||1,sy=b.height/a.height||1,lift=Math.min(120,Math.abs(dy)*.3+40);
+    setTimeout(()=>s.classList.add('moved'),i*stg);
+    const an=cl.animate([{transform:'translate(0,0) scale(1,1)'},{transform:`translate(${dx/2}px,${dy/2-lift}px) scale(${(1+sx)*.62},${(1+sy)*.62})`,offset:.55},{transform:`translate(${dx}px,${dy}px) scale(${sx},${sy})`}],{duration:dur,delay:i*stg,easing:'cubic-bezier(.45,0,.3,1)',fill:'forwards'});
+    an.onfinish=fin;setTimeout(fin,dur+i*stg+500);
+  })))}
+async function move(src,tks,anim){const n=Math.min(src.length,tks.length);if(anim&&src[0]&&!src[0].getClientRects().length)anim=false;
+  if(anim)await fly(src.slice(0,n).map((s,i)=>[s,tks[i]]));else{src.forEach(s=>s.classList.add('moved'));tks.forEach(t=>t.classList.remove('gh'))}}
+
+/* ===== 3、9 的倍數 ===== */
+function b39(k){return(n,vin)=>{
+  const N=+n,D=digs(n),nz=D.filter(o=>o.d),sum=sumd(D),q=sum/k|0,r=sum%k,ok=!r;
+  const g100=k===9?(r,c)=>r<9?A[c%2]:'#86efac':(r,c)=>r<9?A[(c+(r/3|0))%2]:['#86efac','#f9a8d4','#86efac'][c/3|0];
+  const g10=k===9?()=>A[0]:i=>A[(i/3|0)%2];
+  const parts=nz.map(o=>{
+    if(o.p>=4)return part(`${o.d} 個 ${o.v}`,rep(o.d,()=>item(cube('lit',o.p),'+1')),`${o.v-1} = ${k}×${(o.v-1)/k}`,1,stl(o.p),`${o.v} = ${o.v-1} + 1`);
+    if(o.p===3)return part(`${o.d} 個 100`,rep(o.d,()=>item(hundred(g100,1),'99 + 1')),`99 = ${k}×${99/k}（${99/k} 組）`,1,stl(3));
+    if(o.p===2)return part(`${o.d} 個 10`,rep(o.d,()=>item(ten(g10,1),'9 + 1')),`9 = ${k}×${9/k}`,1,stl(2));
+    return part(`${o.d} 個 1`,[item(ones(o.d),'')],'',0,stl(1))});
+  const list=[];D.forEach(o=>{for(let i=0;i<o.d;i++)list.push(COL[o.p])});
+  const T=tray('🧺 「多出來的 1」集合區');const tks=groups(T.b,list,k,3);
+  const vd=h('div','vd '+(ok?'ok':'no'),ok?`✓ ${sum} 是 ${k} 的倍數 → ${N} 是 ${k} 的倍數`:`✗ ${sum} = ${k}×${q} + ${r} → ${N} 不是 ${k} 的倍數`);
+  T.t.append(vd);vin.append(row(parts),T.t);
+  const hi=nz.filter(o=>o.p>1),se=D.map(o=>C(o.d,o.p)).join('+');
+  const r0=`${N} = `+nz.map(o=>o.p>1?`${C(o.d,o.p)}×${o.v}`:C(o.d,1)).join(' + ');
+  const r1=`= `+nz.map(o=>o.p>1?`${C(o.d,o.p)}×(${o.v-1}+1)`:C(o.d,1)).join(' + ');
+  const r2=`= `+nz.map(o=>o.p>1?`${C(o.d,o.p)}×${o.v-1} + ${C(o.d,o.p)}`:C(o.d,1)).join(' + ');
+  const r3=hi.length?hi.map(o=>`${o.v-1} = ${k}×${(o.v-1)/k}`).join('、')+` → 都是 ${k} 的倍數`:'沒有十位以上的數';
+  const big=hi.map(o=>`${C(o.d,o.p)}×${o.v-1}`).join(' + ')||'0';
+  const r4=`= <span class="ug">${big}</span> + <span class="um">(${se})</span>`;
+  const r5=`<span class="tg">${k} 的倍數</span> 不用管，只看 ${se} = <b>${sum}</b>`;
+  const r6=`<span class="${ok?'okc':'noc'}">${sum} = ${k}×${q}${r?' + '+r:''} → ${N} ${ok?'是':'不是'} ${k} 的倍數 ${ok?'✓':'✗'}</span>`;
+  const bigs=hi.filter(o=>o.p>=4).map(o=>`${o.v-1} = ${k}×${(o.v-1)/k}`);
+  const gcap=(k===9?'同顏色 = 9 個一組：99 → 11 組（10 直排 + 最下面 1 橫排）、9 → 1 組':'同顏色 = 3 個一組：99 → 33 組、9 → 3 組')+(bigs.length?'；'+bigs.join('、'):'')+'，全部剛好分完！';
+  return{steps:[
+    {cap:`把 ${N} 拆成：${nz.map(o=>`${o.d} 個 ${o.v}`).join('、')}`,rows:[r0]},
+    {cap:hi.length?`關鍵：${hi.map(o=>`${o.v} = ${o.v-1} + 1`).join('、')}，亮起來的方塊就是「多出來的 1」`:'個位數直接看',rows:[r1,r2],go:async a=>{vin.classList.add('split');if(a){vin.classList.add('pulse');await sleep(950);vin.classList.remove('pulse')}}},
+    {cap:gcap,rows:[r3],go:async()=>vin.classList.add('grp')},
+    {cap:`把多出來的 1 集合起來：${D.map(o=>o.d).join(' + ')} = ${sum} 個，剛好就是「各位數字和」！`,rows:[r4],go:async a=>{T.hd.innerHTML=`🧺 多出來的 1：${se} = <b>${sum}</b> 個`;await move([...vin.querySelectorAll('.blocks .c.lit,.blocks .c.u1')],tks,a)}},
+    {cap:`分好組的大塊一定是 ${k} 的倍數，不用管它！`,rows:[r5],go:async()=>vin.classList.add('done')},
+    {cap:ok?`${sum} 個剛好 ${k} 個 ${k} 個分完 → ${N} 是 ${k} 的倍數 ✓`:`${sum} 個分成 ${q} 組還剩 ${r} 個 → ${N} 不是 ${k} 的倍數 ✗（${N} 除以 ${k} 也餘 ${r}）`,rows:[r6],go:async()=>{T.t.classList.add('grouped');vd.classList.add('show')}}
+  ]};
+}}
+
+/* ===== 2、4、8 的倍數 ===== */
+function bTail(k){return(n,vin)=>{
+  const N=+n,dc={2:1,4:2,8:3}[k],base=10**dc,pre=Math.floor(N/base),tail=N%base,q=tail/k|0,r=tail%k,ok=!r;
+  const D=digs(n),nz=D.filter(o=>o.d),ts=N>=base?String(tail).padStart(dc,'0'):String(tail),dn=['','個位','末兩位','末三位'][dc];
+  const gP=(r,c)=>A[(r+(c>>1))%2],gQ=(r,c)=>A[((r>>1)+(c>>1))%2];
+  const safe=[],tp=[];
+  nz.forEach(o=>{
+    if(o.p>dc){
+      if(o.p>=4)safe.push(part(`${o.d} 個 ${o.v}`,rep(o.d,()=>item(cube(null,o.p))),`${o.v} = ${k}×${o.v/k}`,1,stl(o.p)));
+      else if(o.p===3)safe.push(part(`${o.d} 個 100`,rep(o.d,()=>item(hundred(k===2?gP:gQ))),`100 = ${k}×${100/k}（${100/k} 組）`,1,stl(3)));
+      else safe.push(part(`${o.d} 個 10`,rep(o.d,()=>item(ten(i=>A[(i>>1)%2]))),'10 = 2×5（5 組）',1,stl(2)));
+    }else{
+      if(o.p===3)tp.push(part(`${o.d} 個 100`,rep(o.d,()=>item(hundred())),undefined,0,stl(3)));
+      else if(o.p===2)tp.push(part(`${o.d} 個 10`,rep(o.d,()=>item(ten())),undefined,0,stl(2)));
+      else tp.push(part(`${o.d} 個 1`,[item(ones(o.d))],undefined,0,stl(1)));
+    }});
+  const tw=h('div','tw'),twl=h('div','twl',`${dn}：${ts}`);tw.append(twl,tp.length?row(tp):h('div','zero','0'));
+  const b=row(safe);if(safe.length)b.append(h('div','plus','+'));b.append(tw);vin.append(b);
+  [...tw.querySelectorAll('.c')].forEach((c,i)=>{const g=i/k|0;if(g<q){c.dataset.t=1;c.style.setProperty('--tcol',TC[g%3])}else c.classList.add('rm')});
+  let oe=null;
+  if(k===2){oe=h('div','oe','個位：'+rep(10,d=>`<span class="${d%2?'od':'ev'}${d===tail?' me':''}">${d}</span>`).join('')+'<span class="ev">偶數 = 2 的倍數</span><span class="od">奇數 = 2 的倍數 + 1</span>');vin.append(oe)}
+  const vd=h('div','vd '+(ok?'ok':'no'),ok?`✓ ${dn} ${ts} = ${k}×${q} → ${N} 是 ${k} 的倍數`:`✗ ${dn} ${ts} = ${k}×${q} + ${r} → ${N} 不是 ${k} 的倍數`);
+  vin.append(vd);
+  const r0=`${N} = `+nz.map(o=>o.p>1?`${C(o.d,o.p)}×${o.v}`:C(o.d,1)).join(' + ');
+  const r1=pre?`= ${pre}×${base} + <b class="pk">${ts}</b>`:`${N} 只有${dn}`;
+  const r2=`${base} = ${k}×${base/k}`;
+  const r3=pre?`${pre}×${base} = ${pre}×${base/k}×${k} → <span class="tg">${k} 的倍數</span>`:'沒有更高的位';
+  const r4=k===2?`個位 ${tail} = 2×${q}${r?' + 1':''} → <b>${r?'奇數':'偶數'}</b>`:`只看${dn}：<b class="pk">${ts}</b> = ${k}×${q}${r?' + '+r:''}`;
+  const r5=`<span class="${ok?'okc':'noc'}">${N} ${ok?'是':'不是'} ${k} 的倍數 ${ok?'✓':'✗'}</span>`;
+  const capSafe={2:'10 = 2×5、100 = 2×50…：同顏色 2 個一對，全部剛好配完（1000、1萬、10萬 也都是 2 的倍數）',4:'100 = 4×25：同顏色 4 個（2×2）一組，剛好 25 組；1000、1萬、10萬 都是 100 的倍數，也都能分完',8:'1000 = 8×125：每個 1000 都能 8 個 8 個分完；1萬、10萬 是 1000 的倍數也一樣（100 不行，所以要看末三位）'}[k];
+  return{steps:[
+    {cap:`把 ${N} 拆開，粉紅虛線框裡是「${dn}」`,rows:[r0,r1]},
+    {cap:safe.length?capSafe:`${N} 沒有比${dn}更高的位`,rows:pre?[r2]:[],go:async()=>vin.classList.add('grp')},
+    {cap:pre?`前面的 ${pre}×${base} 一定是 ${k} 的倍數 → 不用管，只看${dn}！`:`直接看${dn}`,rows:[r3],go:async()=>vin.classList.add('done')},
+    {cap:k===2?`個位 ${tail} 個方塊兩個兩個配對 → ${r?'剩 1 個，是奇數':'剛好配完，是偶數'}`:`${dn} ${ts} 個方塊每 ${k} 個一組 → ${q} 組，剩 ${r} 個`,rows:[r4],go:async()=>{vin.classList.add('tgr');twl.innerHTML=`${dn}：${ts} = ${k}×${q}${r?' + '+r:''}`;oe&&oe.classList.add('show')}},
+    {cap:k===2?`個位是 ${tail}（${r?'奇':'偶'}數）→ ${N} ${ok?'是':'不是'} 2 的倍數 ${ok?'✓':'✗'}`:`${dn} ${ok?'能':'不能'}被 ${k} 整除 → ${N} ${ok?'是':'不是'} ${k} 的倍數 ${ok?'✓':'✗'}`,rows:[r5],go:async()=>vd.classList.add('show')}
+  ]};
+}}
+
+/* ===== 11 的倍數 ===== */
+function b11(n,vin){
+  const N=+n,D=digs(n),nz=D.filter(o=>o.d),odd=D.filter(o=>o.p%2),even=D.filter(o=>!(o.p%2));
+  const os=sumd(odd),es=sumd(even),m=Math.min(os,es),diff=Math.abs(os-es),ok=diff%11===0;
+  const core=o=>o.p%2?o.v-1:o.v+1;
+  const parts=nz.map(o=>{const od=o.p%2,lab=`${o.d} 個 ${o.v}<small>（第${o.p}位・${od?'奇':'偶'}）</small>`,st=od?'background:#dbeafe;color:#1d4ed8':'background:#fce7f3;color:#be185d';
+    if(o.p>=4)return part(lab,rep(o.d,()=>item(cube(od?'lit':'hole',o.p),od?'+1':'−1')),`${core(o)} = 11×${core(o)/11}`,1,st,`${o.v} = ${core(o)} ${od?'+':'−'} 1`);
+    if(o.p===3)return part(lab,rep(o.d,()=>item(hundred((r,c)=>PAL[r<9?r:c],1),'99 + 1')),'99 = 11×9（9 組）',1,st);
+    if(o.p===2)return part(lab,rep(o.d,()=>item(ten(()=>'#fcd34d',0,1),'11 − 1')),'11 = 11×1',1,st);
+    return part(lab,[item(ones(o.d),'+ '+o.d)],'',0,st)});
+  const pl=[],ml=[];D.forEach(o=>{for(let i=0;i<o.d;i++)(o.p%2?pl:ml).push(o.p%2?COL[o.p]:'neg')});
+  function side(list,title,cls){const T=tray(title,cls),tks=[];
+    if(!list.length)T.b.append(h('div','zero','0'));
+    if(m){const cw=h('div','cw'),cb=h('div','cb');cb.style.setProperty('--gcols',Math.min(6,m));list.slice(0,m).forEach(c=>{const t=tok(c);cb.append(t);tks.push(t)});cw.append(cb,h('div','cn2',`↔ 抵消 ${m} 個`));T.b.append(cw)}
+    if(list.length>m)tks.push(...groups(T.b,list.slice(m),11,6));
+    return{T,tks}}
+  const P=side(pl,'＋ 多出來的 1（奇數位：第1、3、5位）','pl1'),M=side(ml,'− 少掉的 1（偶數位：第2、4、6位）','mi1');
+  const trays=h('div','trays');trays.append(P.T.t,M.T.t);
+  const why=diff===0?'差是 0':ok?'差是 11 的倍數':'差不是 11 的倍數或 0';
+  const vd=h('div','vd '+(ok?'ok':'no'),`${Math.max(os,es)} − ${m} = ${diff}，${why} → ${N} ${ok?'是':'不是'} 11 的倍數 ${ok?'✓':'✗'}`);
+  vin.append(row(parts),trays,vd);
+  const oex=odd.map(o=>C(o.d,o.p)).join('+')||'0',eex=even.map(o=>C(o.d,o.p)).join('+')||'0';
+  const hi=nz.filter(o=>o.p>1);
+  const r0=`${N} = `+nz.map(o=>o.p>1?`${C(o.d,o.p)}×${o.v}`:C(o.d,1)).join(' + ');
+  const r1=`= `+nz.map(o=>o.p===1?C(o.d,1):`${C(o.d,o.p)}×(${core(o)}${o.p%2?'+':'−'}1)`).join(' + ');
+  const r2=hi.length?hi.map(o=>`${core(o)} = 11×${core(o)/11}`).join('、')+' → 都是 11 的倍數':'沒有十位以上的數';
+  const r3=`= <span class="ug">11 的倍數</span> + <span class="bl">(${oex})</span> − <span class="pk">(${eex})</span>`;
+  const r4=`奇數位和 <b class="bl">${os}</b>，偶數位和 <b class="pk">${es}</b>`;
+  const r5=`<span class="${ok?'okc':'noc'}">${Math.max(os,es)} − ${m} = ${diff}（${why}）→ ${N} ${ok?'是':'不是'} 11 的倍數 ${ok?'✓':'✗'}</span>`;
+  const c1=hi.map(o=>`${o.v} = ${core(o)} ${o.p%2?'+':'−'} 1`).join('、');
+  const c2=hi.map(o=>o.p===3?'99 → 9 組（每橫排 10 個 + 最下面 1 個）':o.p===2?'10 補 1 個變 11':`${core(o)} = 11×${core(o)/11}`).join('、');
+  return{steps:[
+    {cap:'從個位（最右邊）開始數：第 1、3、5 位是奇數位（藍），第 2、4、6 位是偶數位（粉紅）',rows:[r0]},
+    {cap:`關鍵：${c1} → 奇數位「多 1」，偶數位「少 1」（紅虛線）`,rows:[r1],go:async a=>{vin.classList.add('split');if(a){vin.classList.add('pulse');await sleep(950);vin.classList.remove('pulse')}}},
+    {cap:`同顏色 = 11 個一組：${c2}`,rows:[r2],go:async()=>vin.classList.add('grp')},
+    {cap:'多出來的 1 放進「＋」區，少掉的 1 放進「−」區',rows:[r3],go:async a=>{await Promise.all([move([...vin.querySelectorAll('.blocks .c.lit,.blocks .c.u1')],P.tks,a),move([...vin.querySelectorAll('.blocks .c.hole')],M.tks,a)])}},
+    {cap:`大塊都是 11 的倍數不用管；＋${os} 個和 −${es} 個互相抵消 ${m} 個`,rows:[r4],go:async()=>{vin.classList.add('done');trays.classList.add('cancel')}},
+    {cap:`剩下 ${diff} 個 → ${why} → ${N} ${ok?'是':'不是'} 11 的倍數 ${ok?'✓':'✗'}`,rows:[r5],go:async()=>{P.T.t.classList.add('grouped');M.T.t.classList.add('grouped');vd.classList.add('show')}}
+  ]};
+}
+
+/* ===== 7 的倍數（補充）：三位分節法，最多 12 位 ===== */
+function svg1001(){
+  const cw=4,bw=44,bh=52,gap=6,W=7*bw+6*gap,H=bh+16;
+  let s=`<svg viewBox="0 0 ${W} ${H}" style="width:calc(var(--u)*26);height:calc(var(--u)*${(26*H/W).toFixed(2)})">`;
+  for(let b=0;b<7;b++){const x=b*(bw+gap);s+=`<rect x="${x}" y="0" width="${bw}" height="${bh}" fill="${PAL[[0,1,2,4,6,7,8][b]]}" stroke="#334155" stroke-width="1.2" rx="2"/>`;
+    for(let i=1;i<11;i++)s+=`<line x1="${x+i*cw}" y1="0" x2="${x+i*cw}" y2="${bh}" stroke="#fff" stroke-width=".5"/>`;
+    for(let j=1;j<13;j++)s+=`<line x1="${x}" y1="${j*cw}" x2="${x+bw}" y2="${j*cw}" stroke="#fff" stroke-width=".5"/>`;
+    s+=`<text x="${x+bw/2}" y="${H-2}" font-size="12" font-weight="900" text-anchor="middle" fill="#334155">143</text>`}
+  return s+'</svg>'}
+function svg7(Aa){
+  const T=Aa/70|0,rest=Aa-T*70,bars=Math.ceil(rest/7),bw=12,flatW=10*bw+10,rowH=7*12+18;
+  const fpr=Math.min(5,T)||0,frows=T?Math.ceil(T/fpr):0;
+  const bpr=Math.max(1,Math.min(bars,Math.max(10,fpr*11))),brows=bars?Math.ceil(bars/bpr):0;
+  const W=Math.max(fpr*flatW,bpr*bw,bw),H=Math.max(1,frows+brows)*rowH;
+  const wu=Math.min(W*.11,46);
+  let s=`<svg viewBox="0 0 ${W} ${H}" style="width:calc(var(--u)*${wu.toFixed(1)});height:calc(var(--u)*${(wu*H/W).toFixed(2)})">`;
+  for(let f=0;f<T;f++){const x0=(f%fpr)*flatW,y0=(f/fpr|0)*rowH;
+    for(let c=0;c<10;c++)for(let j=0;j<7;j++)s+=`<rect x="${x0+c*bw+2}" y="${y0+j*12}" width="10" height="10" fill="${A[(f+c)%2]}" stroke="#334155" stroke-width=".6" rx="1.5"/>`;
+    s+=`<rect x="${x0}" y="${y0-2}" width="${10*bw+2}" height="${7*12+2}" fill="none" stroke="#16a34a" stroke-width="2" rx="3"/>`;
+    s+=`<text x="${x0+5*bw+2}" y="${y0+7*12+13}" font-size="12" font-weight="900" text-anchor="middle" fill="#15803d">70（10 組）</text>`}
+  const by=frows*rowH;
+  for(let b=0;b<bars;b++){const x=(b%bpr)*bw+2,y0=by+(b/bpr|0)*rowH,n=Math.min(7,rest-b*7),rm=n<7;
+    for(let j=0;j<n;j++)rm?s+=`<rect x="${x}" y="${y0+j*12}" width="10" height="10" fill="#fee2e2" stroke="#dc2626" stroke-dasharray="2 1" rx="1.5"/>`:s+=`<rect x="${x}" y="${y0+j*12}" width="10" height="10" fill="${A[b%2]}" stroke="#334155" stroke-width=".6" rx="1.5"/>`;
+    if(rm)s+=`<text x="${x+5}" y="${y0+7*12+12}" font-size="11" font-weight="900" text-anchor="middle" fill="#dc2626">剩${n}</text>`;
+    else if((b+1)%5===0||b===bars-1)s+=`<text x="${x+5}" y="${y0+7*12+12}" font-size="11" font-weight="900" text-anchor="middle" fill="#334155">${T*10+b+1}</text>`}
+  return s+'</svg>'}
+function b7(n,vin){
+  const N=+n,s=String(n),G=[];
+  const UN=['個','千','百萬','十億'],UV=['','1,000','1,000,000','1,000,000,000'],ID=['','1001−1','1001×999+1','1001×999001−1'];
+  for(let e=s.length,i=0;e>0;e-=3,i++){const t=s.slice(Math.max(0,e-3),e);G.push({t,v:+t,i,pos:i%2===0})}
+  const L=[...G].reverse();
+  const ps=G.filter(g=>g.pos).reduce((a,g)=>a+g.v,0),ms=G.filter(g=>!g.pos).reduce((a,g)=>a+g.v,0),Sd=ps-ms,A1=Math.abs(Sd);
+  let fin=A1,re=null;
+  if(A1>=1000){const lo=A1%1000,hi=A1/1000|0,d2=lo-hi;re={lo,hi,d2};fin=Math.abs(d2)}
+  const q=fin/7|0,r=fin%7,ok=!r;
+  const C7=g=>`<b class="${g.pos?'bl':'pk'}">${g.v}</b>`;
+  const top=h('div','r7'),pcs=h('div','pcs');
+  L.forEach((g,j)=>{if(j)pcs.append(h('div','comma',','));const w=h('div','pcw');g.card=h('div','pcn '+(g.pos?'pos':'neg'),g.t);
+    w.append(h('div','pcl',`第${g.i+1}節・${UN[g.i]}`),g.card,h('div','sg7 '+(g.pos?'pos':'neg'),g.pos?'＋':'−'));pcs.append(w)});
+  const why=h('div','why'),wr=h('div','wrow');wr.append(cube('hole',4,true),h('div','n7l','1000 = <b>1001</b> − 1'));
+  why.append(wr,h('div','n7l','1001 = 7 × 143（7 份，每份 11×13 = 143）'));why.insertAdjacentHTML('beforeend',svg1001());
+  top.append(pcs,why);
+  function tray7(list,title,cls,sum){const T=tray(title,cls);if(!list.length)T.b.append(h('div','zero','0'));
+    list.forEach((g,j)=>{if(j)T.b.append(h('span','op','＋'));g.slot=h('div','bd gh '+(g.pos?'pos':'neg'),g.t);T.b.append(g.slot)});
+    T.t.append(h('div','bsum','= '+sum));return T}
+  const oddN=G.filter(g=>g.pos).map(g=>g.i+1).join('、'),evN=G.filter(g=>!g.pos).map(g=>g.i+1).join('、')||'2';
+  const P=tray7(L.filter(g=>g.pos),`＋ 奇數節（第${oddN}節）`,'pl1',ps),M=tray7(L.filter(g=>!g.pos),`− 偶數節（第${evN}節）`,'mi1',ms);
+  const trays=h('div','trays');trays.append(P.t,M.t);
+  const reEl=h('div','re7',re?`${A1.toLocaleString('en-US')} 還有四位 → 再分一次節：<span class="bl">${String(re.lo).padStart(3,'0')}</span> − <span class="pk">${re.hi}</span> = ${re.d2}`:'');
+  const g7=h('div','g7');g7.append(h('div','n7l',fin?`${fin} 個：每 7 個一直條${fin>=70?'（每 10 條＝70 個併成一大片）':''}`:'差是 0'));if(fin)g7.insertAdjacentHTML('beforeend',svg7(fin));
+  const vd=h('div','vd '+(ok?'ok':'no'),`${fin} ${ok?'是':'不是'} 7 的倍數 → ${N.toLocaleString('en-US')} ${ok?'是':'不是'} 7 的倍數 ${ok?'✓':'✗'}`);
+  vin.append(top,trays,reEl,g7,vd);
+  const idRows=['1001 = 7 × 11 × 13','1,000 = 1001 − 1'];
+  if(G.length>=3)idRows.push('1,000,000 = 1001×999 + 1');
+  if(G.length>=4)idRows.push('1,000,000,000 = 1001×999001 − 1');
+  const st=[{cap:`從個位往左，每三位數分成一節（就是千分位的逗號），共 ${G.length} 節`,rows:[`${N} → <b>${L.map(g=>g.t).join(',')}</b>`]},
+    {cap:'關鍵：1001 = 7×11×13，1000 = 1001 − 1。每往左一節就再乘 1000，正負號就翻一次（＋ − ＋ −）',rows:idRows,go:async()=>why.classList.add('show')}];
+  if(G.length>1){
+    const t1=L.map(g=>g.i===0?C7(g):`${C7(g)}×${UV[g.i]}`).join(' + ');
+    const t2=L.map(g=>g.i===0?C7(g):`${C7(g)}×(${ID[g.i]})`).join(' + ');
+    const pe=L.filter(g=>g.pos).map(C7).join(' + '),me=L.filter(g=>!g.pos).map(C7).join(' + ');
+    st.push({cap:'從右邊起：第 1 節「＋」、第 2 節「−」、第 3 節「＋」、第 4 節「−」，一加一減交替',rows:[`${N} = ${t1}`,`= ${t2}`],go:async()=>vin.classList.add('s2')});
+    st.push({cap:'1001 的倍數一定是 7 的倍數，不用管；＋節放進＋區，−節放進−區',rows:[`= <span class="ug">1001 的倍數</span> + (${pe}) − (${me})`],go:async a=>{await move(L.map(g=>g.card),L.map(g=>g.slot),a)}});
+    st.push({cap:`＋區合計 ${ps}，−區合計 ${ms}，相減得 ${Sd}${Sd<0?`（負數沒關係，看 ${A1}）`:''}`,rows:[`${ps} − ${ms} = ${Sd}`],go:async()=>vin.classList.add('s4')});
+  }else st.push({cap:`${N} 只有一節，直接判斷`,rows:[`${N} 只有一節`],go:async a=>{vin.classList.add('s2');await move(L.map(g=>g.card),L.map(g=>g.slot),a);vin.classList.add('s4')}});
+  if(re)st.push({cap:`差 ${A1} 還是四位數 → 對它再用一次三位分節法`,rows:[`${A1} → ${re.hi},${String(re.lo).padStart(3,'0')}`,`${re.lo} − ${re.hi} = ${re.d2}`],go:async()=>vin.classList.add('s45')});
+  const sameR=N%7===r;
+  st.push({cap:`${fin} 個每 7 個一組 → ${q} 組，剩 ${r} 個${sameR&&G.length>1?`（原數除以 7 也餘 ${r}）`:''}`,rows:[`${fin} = 7×${q}${r?' + '+r:''}`],go:async()=>vin.classList.add('s5')});
+  st.push({cap:`${N.toLocaleString('en-US')} ${ok?'是':'不是'} 7 的倍數 ${ok?'✓':'✗'}　💡 1001 = 7×11×13，同一個差也能判斷 11 和 13！`,rows:[`<span class="${ok?'okc':'noc'}">${N} ${ok?'是':'不是'} 7 的倍數 ${ok?'✓':'✗'}</span>`,`加碼：${A1} ${A1%11?'不是':'是'} 11 的倍數、${A1%13?'不是':'是'} 13 的倍數 → 原數也一樣`],go:async()=>vd.classList.add('show')});
+  return{steps:st};
+}
+
+/* ===== 規則設定 ===== */
+const ORDER=['2','4','8','3','9','11','7'];
+const RULES={
+  '2':{p:['2136','123457','1350'],max:6,rule:'<b>2 的倍數：</b>個位是 0、2、4、6、8（偶數），就是 2 的倍數。',b:bTail(2)},
+  '4':{p:['7528','123456','1350'],max:6,rule:'<b>4 的倍數：</b>末兩位數是 4 的倍數，這個數就是 4 的倍數。',b:bTail(4)},
+  '8':{p:['7528','123456','3100'],max:6,rule:'<b>8 的倍數：</b>末三位數是 8 的倍數，這個數就是 8 的倍數。',b:bTail(8)},
+  '3':{p:['2136','123456','1234'],max:6,rule:'<b>3 的倍數：</b>各位數字和是 3 的倍數，這個數就是 3 的倍數。',b:b39(3)},
+  '9':{p:['1233','123453','2136'],max:6,rule:'<b>9 的倍數：</b>各位數字和是 9 的倍數，這個數就是 9 的倍數。',b:b39(9)},
+  '11':{p:['9724','123321','2345'],max:6,rule:'<b>11 的倍數：</b>「奇數位數字和」與「偶數位數字和」的差是 11 的倍數或 0。',b:b11},
+  '7':{p:['366415','864197523','123456789012','999999999999'],max:12,rule:'<b>7 的倍數（補充・三位分節法）：</b>從個位起每三位一節，「第1、3節和 − 第2、4節和」是 7 的倍數或 0，原數就是 7 的倍數。（最多 12 位）',b:b7}
+};
+
+/* ===== 放大鏡（雙指縮放、拖曳、雙擊放大） ===== */
+function Zoomer(panel,zw,lay,layLabel){
+  let z=1,tx=0,ty=0;
+  const zc=panel.querySelector('.zc');
+  zc.innerHTML='<button data-a="out" title="縮小">−</button><button data-a="pct" title="還原 100%">100%</button><button data-a="in" title="放大">＋</button><button data-a="lay" class="lay"></button>';
+  const pct=zc.querySelector('[data-a=pct]'),layB=zc.querySelector('.lay');
+  function clamp(){const cw=zw.offsetWidth,ch=zw.offsetHeight;tx=Math.min(0,Math.max(cw-cw*z,tx));ty=Math.min(0,Math.max(ch-ch*z,ty))}
+  function apply(){clamp();zw.style.transform=z>1.001?`translate(${tx}px,${ty}px) scale(${z})`:'';pct.textContent=Math.round(z*100)+'%';panel.classList.toggle('zoomed',z>1.001)}
+  function loc(cx,cy){const r=panel.getBoundingClientRect();return[cx-r.left-zw.offsetLeft,cy-r.top-zw.offsetTop]}
+  function zoomAt(nz,cx,cy){nz=Math.max(1,Math.min(4,nz));const[px,py]=loc(cx,cy);tx=px-(px-tx)*nz/z;ty=py-(py-ty)*nz/z;z=nz;if(z<=1.001){z=1;tx=ty=0}apply()}
+  function ctr(){const r=panel.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]}
+  const api={reset(){z=1;tx=ty=0;apply()},zoomBy(k){const[a,b]=ctr();zoomAt(z*k,a,b)},get z(){return z},setLay(on){layB.textContent=on?'↙ 還原':'⤢ '+layLabel}};
+  zc.addEventListener('click',e=>{const a=e.target.closest('button')?.dataset.a;if(a==='in')api.zoomBy(1.3);else if(a==='out')api.zoomBy(1/1.3);else if(a==='pct')api.reset();else if(a==='lay')setLayout(lay)});
+  const P=new Map();let g=null,moved=false,pinched=false,sx=0,sy=0,last=0,lx=0,ly=0;
+  const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  panel.addEventListener('pointerdown',e=>{if(e.target.closest('.zc'))return;try{panel.setPointerCapture(e.pointerId)}catch(_){}
+    P.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(P.size===1){sx=e.clientX;sy=e.clientY;moved=false;pinched=false;g={t:'pan',tx,ty,x:e.clientX,y:e.clientY}}
+    else if(P.size===2){const[a,b]=[...P.values()];g={t:'pinch',d:dist(a,b)||1,z0:z,tx0:tx,ty0:ty,cx:(a.x+b.x)/2,cy:(a.y+b.y)/2};moved=pinched=true}});
+  panel.addEventListener('pointermove',e=>{if(!P.has(e.pointerId)||!g)return;P.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(g.t==='pinch'&&P.size>=2){const[a,b]=[...P.values()],nz=Math.max(1,Math.min(4,g.z0*dist(a,b)/g.d)),[px,py]=loc(g.cx,g.cy);
+      tx=px-(px-g.tx0)*nz/g.z0+((a.x+b.x)/2-g.cx);ty=py-(py-g.ty0)*nz/g.z0+((a.y+b.y)/2-g.cy);z=nz;if(z<=1.001){z=1;tx=ty=0}apply()}
+    else if(g.t==='pan'){const dx=e.clientX-g.x,dy=e.clientY-g.y;if(Math.hypot(dx,dy)>8)moved=true;if(z>1.001){tx=g.tx+dx;ty=g.ty+dy;apply()}}});
+  function up(e){if(!P.has(e.pointerId))return;P.delete(e.pointerId);
+    if(P.size===1){const r=[...P.values()][0];g={t:'pan',tx,ty,x:r.x,y:r.y};return}
+    if(P.size)return;
+    const dx=e.clientX-sx,dy=e.clientY-sy;
+    if(!moved){const now=Date.now();
+      if(now-last<330&&Math.hypot(e.clientX-lx,e.clientY-ly)<40){z>1.05?api.reset():zoomAt(2.2,e.clientX,e.clientY);last=0}
+      else{last=now;lx=e.clientX;ly=e.clientY}}
+    else if(!pinched&&z<=1.001&&e.pointerType!=='mouse'&&Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.5){stop();goto(S.step+(dx<0?1:-1))}
+    g=null}
+  panel.addEventListener('pointerup',up);panel.addEventListener('pointercancel',up);
+  panel.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey){e.preventDefault();zoomAt(z*Math.exp(-e.deltaY*.01),e.clientX,e.clientY)}
+    else if(z>1.001){e.preventDefault();tx-=e.deltaX;ty-=e.deltaY;apply()}},{passive:false});
+  ['gesturestart','gesturechange'].forEach(t=>panel.addEventListener(t,e=>e.preventDefault()));
+  api.setLay(false);return api;
+}
+
+/* ===== 引擎 ===== */
+const S={rule:'2',num:'2136',step:0,busy:false,playing:false,mode:'projector',layout:'both',zf:1};let cur=null;
+try{S.zf=+localStorage.getItem('dv-zf')||1;S.layout=localStorage.getItem('dv-lay')||'both'}catch(e){}
+function fit(){const V=$('#vis'),vin=$('#visz').firstChild;if(!vin)return;const H=V.clientHeight-16;if(H<=0)return;
+  const ok=u=>{vin.style.setProperty('--u',u+'px');return vin.offsetHeight<=H&&vin.scrollWidth<=vin.clientWidth+1};
+  let lo=2,hi=S.mode==='mobile'?22:(S.layout==='vis'?40:30);if(ok(hi))return;for(let i=0;i<11;i++){const m=(lo+hi)/2;ok(m)?lo=m:hi=m}ok(lo)}
+function fitEq(){const E=$('#eq'),Z=$('#eqz'),avail=E.clientHeight-(S.mode==='mobile'?12:20);if(avail<=0)return;
+  let f=(S.mode==='mobile'?30:(S.layout==='eq'?90:58))*S.zf;Z.style.fontSize=f+'px';while(f>13&&Z.offsetHeight>avail){f-=2;Z.style.fontSize=f+'px'}}
+function rebuild(){document.querySelectorAll('.flyer').forEach(e=>e.remove());SMALL=S.num.length>=5;const V=$('#visz');V.innerHTML='';const vin=h('div','vin');V.append(vin);cur=RULES[S.rule].b(S.num,vin);S.step=0;fit()}
+function render(){const st=cur.steps[S.step];
+  $('#cap').innerHTML=`<span class="sn">步驟 ${S.step+1}/${cur.steps.length}</span><span>${st.cap}</span>`;
+  const E=$('#eqz');E.innerHTML='<div class="eqt">📝 算式推導</div>';
+  cur.steps.slice(0,S.step+1).forEach((s,i)=>(s.rows||[]).forEach(r=>E.append(h('div','row '+(i===S.step?'cur':'old'),r))));
+  fitEq();
+  const d=$('#dots');d.innerHTML='';cur.steps.forEach((_,i)=>{const x=h('span','dot'+(i<=S.step?' on':'')+(i===S.step?' cur':''));x.onclick=()=>{stop();goto(i)};d.append(x)});
+  $('#prev').disabled=S.step===0;$('#next').disabled=S.step===cur.steps.length-1}
+async function jumpTo(t){const app=$('#app');app.classList.add('noanim');rebuild();
+  for(let i=1;i<=t&&i<cur.steps.length;i++)cur.steps[i].go&&await cur.steps[i].go(false);
+  S.step=Math.min(t,cur.steps.length-1);render();void app.offsetWidth;setTimeout(()=>app.classList.remove('noanim'),60)}
+async function goto(t){if(S.busy||!cur)return;t=Math.max(0,Math.min(cur.steps.length-1,t));if(t===S.step)return;
+  if(t===S.step+1){S.busy=true;S.step=t;render();try{cur.steps[t].go&&await cur.steps[t].go(true)}finally{S.busy=false}}
+  else await jumpTo(t)}
+function stop(){S.playing=false;$('#play').classList.remove('on');$('#play').textContent='▶ 播放'}
+async function play(){if(S.playing){stop();return}if(S.step===cur.steps.length-1)await jumpTo(0);
+  S.playing=true;$('#play').classList.add('on');$('#play').textContent='⏸ 暫停';
+  while(S.playing&&S.step<cur.steps.length-1){await sleep(S.step===0?1500:2800);if(!S.playing)break;await goto(S.step+1)}stop()}
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',3500)}
+function resetZoom(){VZ.reset();EZ.reset()}
+function refresh(){setTimeout(()=>{syncH();if(cur){stop();jumpTo(S.step)}},40)}
+function setRule(r){S.rule=r;stop();resetZoom();
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.r===r));
+  const inp=$('#num');inp.maxLength=RULES[r].max;inp.classList.toggle('long',RULES[r].max>6);
+  $('#rule').innerHTML=RULES[r].rule;const p=$('#presets');p.innerHTML='';
+  RULES[r].p.forEach(v=>{const b=h('button','chip',v);b.onclick=()=>{$('#num').value=v;start()};p.append(b)});
+  S.num=RULES[r].p[0];inp.value=S.num;jumpTo(0)}
+function start(){const v=$('#num').value.trim().replace(/[,，\s]/g,''),mx=RULES[S.rule].max;
+  if(!new RegExp(`^[1-9]\\d{0,${mx-1}}$`).test(v)){toast(`請輸入 1～${'9'.repeat(mx)} 的整數（最多 ${mx} 位數）`);return}
+  S.num=v;$('#num').value=v;stop();resetZoom();$('#num').blur();jumpTo(0)}
+function random(){const k=+S.rule,mx=RULES[S.rule].max,mn=mx>6?6:4,len=mn+Math.floor(Math.random()*(mx-mn+1)),lo=10**(len-1);
+  let x=lo+Math.floor(Math.random()*9*lo);
+  if(Math.random()<.5){x-=x%k;if(x<lo)x+=k}$('#num').value=String(x);start()}
+function setMode(m){S.mode=m;document.body.className=m;document.querySelectorAll('[data-m]').forEach(b=>b.classList.toggle('on',b.dataset.m===m));resetZoom();refresh()}
+function applyLayout(){const st=$('#stage');st.classList.toggle('only-vis',S.layout==='vis');st.classList.toggle('only-eq',S.layout==='eq');
+  VZ.setLay(S.layout==='vis');EZ.setLay(S.layout==='eq');try{localStorage.setItem('dv-lay',S.layout)}catch(e){}}
+function setLayout(l){S.layout=S.layout===l?'both':l;applyLayout();resetZoom();refresh()}
+function setZF(d){S.zf=Math.round(Math.max(.8,Math.min(1.8,S.zf+d))*10)/10;document.documentElement.style.setProperty('--zf',S.zf);
+  $('#zfv').textContent=Math.round(S.zf*100)+'%';try{localStorage.setItem('dv-zf',S.zf)}catch(e){}refresh()}
+function syncH(){$('#app').style.height=Math.round(innerHeight)+'px'}
+async function fullscreen(){const el=document.documentElement;
+  try{if(document.fullscreenElement||document.webkitFullscreenElement){(document.exitFullscreen||document.webkitExitFullscreen).call(document);return}
+    if(el.requestFullscreen)await el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();else throw 0}
+  catch(e){toast('此環境不支援全螢幕：請另存成 .html 用 Safari 開啟，或「加入主畫面」後開啟（版面仍固定一頁）')}}
+
+const VZ=Zoomer($('#vis'),$('#visz'),'vis','大圖'),EZ=Zoomer($('#eq'),$('#eqz'),'eq','大算式');
+ORDER.forEach(r=>{const b=h('button',null,r==='7'?'7<small>補充</small>':r);b.dataset.r=r;b.onclick=()=>setRule(r);$('#tabs').append(b)});
+document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+$('#prev').onclick=()=>{stop();goto(S.step-1)};$('#next').onclick=()=>{stop();goto(S.step+1)};$('#play').onclick=play;
+$('#start').onclick=start;$('#rand').onclick=random;$('#fs').onclick=fullscreen;
+$('#zfm').onclick=()=>setZF(-.1);$('#zfp').onclick=()=>setZF(.1);
+$('#num').addEventListener('keydown',e=>{if(e.key==='Enter')start()});
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const k=e.key;
+  if(['ArrowRight','PageDown',' ','Enter','ArrowDown'].includes(k)){e.preventDefault();stop();goto(S.step+1)}
+  else if(['ArrowLeft','PageUp','Backspace','ArrowUp'].includes(k)){e.preventDefault();stop();goto(S.step-1)}
+  else if(k==='+'||k==='='){e.preventDefault();(S.layout==='eq'?EZ:VZ).zoomBy(1.3)}
+  else if(k==='-'||k==='_'){e.preventDefault();(S.layout==='eq'?EZ:VZ).zoomBy(1/1.3)}
+  else if(k==='0'){e.preventDefault();resetZoom()}
+  else if(k==='g'||k==='G')setLayout('vis');else if(k==='e'||k==='E')setLayout('eq');
+  else if(k==='p'||k==='P')play();else if(k==='f'||k==='F')fullscreen()});
+let rt;function onResize(){syncH();clearTimeout(rt);rt=setTimeout(()=>{if(!S.busy&&cur){resetZoom();jumpTo(S.step)}},250)}
+addEventListener('resize',onResize);
+document.addEventListener('fullscreenchange',onResize);document.addEventListener('webkitfullscreenchange',onResize);
+
+/* 解析 URL 參數（方便直接分享特定規則與數字） */
+const params=new URLSearchParams(location.search);
+const pRule=params.get('r')||params.get('rule');
+const pNum=params.get('n')||params.get('num');
+const pMode=params.get('m')||params.get('mode');
+const hs=location.hash.slice(1);
+
+S.mode=pMode==='mobile'||hs==='mobile'?'mobile':pMode==='projector'||hs==='projector'?'projector':(innerWidth<700?'mobile':'projector');
+document.body.className=S.mode;
+document.querySelectorAll('[data-m]').forEach(b=>b.classList.toggle('on',b.dataset.m===S.mode));
+document.documentElement.style.setProperty('--zf',S.zf);
+$('#zfv').textContent=Math.round(S.zf*100)+'%';
+applyLayout();
+syncH();
+
+const targetRule=(pRule&&RULES[pRule])?pRule:(hs&&RULES[hs])?hs:'2';
+setRule(targetRule);
+if(pNum&&new RegExp(`^[1-9]\\d{0,${RULES[targetRule].max-1}}$`).test(pNum)){
+  $('#num').value=pNum;
+  start();
+}
+</script>
+</body>
+</html>
