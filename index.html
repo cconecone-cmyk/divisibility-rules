@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1e3a8a">
-<title>倍數判別法 動畫教學 🔢 幾何方塊拆解與算式推導</title>
-<meta name="description" content="國中數學《倍數判別法》幾何動態視覺化教學工具！包含 2、4、8、3、9、11、7（三位分節法）的倍數判別原理、方塊拆解與算式推導動畫演示。">
+<title id="doc-title">倍數判別法 動畫教學 🔢 幾何方塊拆解與算式推導</title>
+<meta name="description" id="doc-desc" content="國中數學《倍數判別法》幾何動態視覺化教學工具！包含 2、4、8、3、9、11、7（三位分節法）的倍數判別原理、方塊拆解與算式推導動畫演示。">
 <meta property="og:title" content="倍數判別法 動畫教學 🔢">
 <meta property="og:description" content="幾何方塊拆解與算式推導視覺化，支援 2、4、8、3、9、11、7（三位分節法）倍數判別動畫演示。">
 <meta property="og:type" content="website">
@@ -35,6 +35,8 @@ header{display:flex;align-items:center;gap:8px;padding:6px 10px;background:linea
 .hb.on{background:#fff;color:#1e3a8a}
 .hb:hover{background:rgba(255,255,255,.28)}
 .hb.on:hover{background:#fff}
+.hb.lang{background:#f59e0b;color:#1e293b;font-weight:900}
+.hb.lang:hover{background:#fbbf24}
 .gh-btn{display:inline-flex;align-items:center;gap:4px;text-decoration:none;color:#fff;background:rgba(255,255,255,.18);border-radius:8px;padding:6px 10px;font-weight:800;font-size:14px;white-space:nowrap;transition:background .2s}
 .gh-btn:hover{background:rgba(255,255,255,.3)}
 .zfv{font-size:13px;font-weight:800;min-width:2.6em;text-align:center}
@@ -211,13 +213,14 @@ body.mobile .kbd{display:none}
 <body>
 <div class="app" id="app">
   <header>
-    <div class="brand"><span>🔢</span> <a href="./" title="重設並回到首頁">倍數判別法</a></div>
+    <div class="brand"><span>🔢</span> <a href="./" id="brand-link" title="重設並回到首頁">倍數判別法</a></div>
     <nav class="tabs" id="tabs"></nav>
+    <button class="hb lang" id="lang-btn" title="切換語言 / Switch language">🌐 EN</button>
     <button class="hb" id="zfm" title="文字縮小">A−</button><span class="zfv" id="zfv">100%</span><button class="hb" id="zfp" title="文字放大">A＋</button>
-    <button class="hb" data-m="projector">📺 投影</button>
-    <button class="hb" data-m="mobile">📱 手機</button>
+    <button class="hb" data-m="projector" id="btn-projector">📺 投影</button>
+    <button class="hb" data-m="mobile" id="btn-mobile">📱 手機</button>
     <button class="hb" id="fs">⛶ 全螢幕</button>
-    <a class="gh-btn" href="https://github.com/cconecone-cmyk/divisibility-rules" target="_blank" rel="noopener noreferrer" title="查看 GitHub 原始碼">
+    <a class="gh-btn" href="https://github.com/cconecone-cmyk/divisibility-rules" target="_blank" rel="noopener noreferrer" title="GitHub Repository">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
       <span>GitHub</span>
     </a>
@@ -239,7 +242,7 @@ body.mobile .kbd{display:none}
     <div class="dots" id="dots"></div>
     <button id="play">▶ 播放</button>
     <button id="next">下一步 ▶</button>
-    <span class="kbd">← → 翻頁｜＋ − 0 放大縮小｜G 大圖｜E 大算式｜P 播放｜F 全螢幕</span>
+    <span class="kbd" id="kbd-hint">← → 翻頁｜＋ − 0 放大縮小｜G 大圖｜E 大算式｜P 播放｜F 全螢幕</span>
   </footer>
 </div>
 <div class="toast" id="toast"></div>
@@ -250,13 +253,98 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const rep=(n,f)=>Array.from({length:n},(_,i)=>f(i));
 const sumd=a=>a.reduce((s,o)=>s+o.d,0);
 const COL={6:'#0d9488',5:'#ea580c',4:'#7c3aed',3:'#2563eb',2:'#16a34a',1:'#db2777'};
-const VN={4:'1000',5:'1萬',6:'10萬'};
 const A=['#fcd34d','#7dd3fc'];
 const TC=['#fcd34d','#7dd3fc','#86efac'];
 const PAL=['#fca5a5','#fdba74','#fcd34d','#bef264','#86efac','#5eead4','#7dd3fc','#a5b4fc','#f0abfc'];
 const C=(d,p)=>`<b style="color:${COL[p]}">${d}</b>`;
 let SMALL=false;
 function digs(n){const s=String(n);return s.split('').map((c,i)=>({d:+c,p:s.length-i,v:10**(s.length-i-1)}))}
+
+/* ===== 語系字典 (i18n) ===== */
+const I18N = {
+  zh: {
+    title: '倍數判別法 動畫教學 🔢 幾何方塊拆解與算式推導',
+    desc: '國中數學《倍數判別法》幾何動態視覺化教學工具！包含 2、4、8、3、9、11、7（三位分節法）的倍數判別原理、方塊拆解與算式推導動畫演示。',
+    brand: '倍數判別法',
+    tab7: '7<small>補充</small>',
+    langBtn: '🌐 EN',
+    langTitle: '切換為英文 / Switch to English',
+    zfmTitle: '文字縮小',
+    zfpTitle: '文字放大',
+    projector: '📺 投影',
+    mobile: '📱 手機',
+    fs: '⛶ 全螢幕',
+    fsNotSupported: '此環境不支援全螢幕：請另存成 .html 用 Safari 開啟，或「加入主畫面」後開啟（版面仍固定一頁）',
+    inputAria: '輸入數字',
+    demo: '演示 ▶',
+    randTitle: '隨機產生數字',
+    step: '步驟',
+    derivation: '📝 算式推導',
+    prev: '◀ 上一步',
+    next: '下一步 ▶',
+    play: '▶ 播放',
+    pause: '⏸ 暫停',
+    kbd: '← → 翻頁｜＋ − 0 放大縮小｜G 大圖｜E 大算式｜P 播放｜F 全螢幕',
+    zoomOut: '縮小',
+    zoomIn: '放大',
+    zoomReset: '還原 100%',
+    layVis: '大圖',
+    layEq: '大算式',
+    layReset: '↙ 還原',
+    valError: mx => `請輸入 1～${'9'.repeat(mx)} 的整數（最多 ${mx} 位數）`,
+    VN: {4:'1000',5:'1萬',6:'10萬'},
+    rules: {
+      '2': '<b>2 的倍數：</b>個位是 0、2、4、6、8（偶數），就是 2 的倍數。',
+      '4': '<b>4 的倍數：</b>末兩位數是 4 的倍數，這個數就是 4 的倍數。',
+      '8': '<b>8 的倍數：</b>末三位數是 8 的倍數，這個數就是 8 的倍數。',
+      '3': '<b>3 的倍數：</b>各位數字和是 3 的倍數，這個數就是 3 的倍數。',
+      '9': '<b>9 的倍數：</b>各位數字和是 9 的倍數，這個數就是 9 的倍數。',
+      '11': '<b>11 的倍數：</b>「奇數位數字和」與「偶數位數字和」的差是 11 的倍數或 0。',
+      '7': '<b>7 的倍數（補充・三位分節法）：</b>從個位起每三位一節，「第1、3節和 − 第2、4節和」是 7 的倍數或 0，原數就是 7 的倍數。（最多 12 位）'
+    }
+  },
+  en: {
+    title: 'Divisibility Rules Animation 🔢 Geometric Visual Proofs',
+    desc: 'Interactive visual tool for divisibility rules (2, 4, 8, 3, 9, 11, 7) using geometric block decompositions and step-by-step mathematical proofs.',
+    brand: 'Divisibility Rules',
+    tab7: '7<small>Extra</small>',
+    langBtn: '🌐 中文',
+    langTitle: 'Switch to Traditional Chinese / 切換為中文',
+    zfmTitle: 'Decrease font size',
+    zfpTitle: 'Increase font size',
+    projector: '📺 Projector',
+    mobile: '📱 Mobile',
+    fs: '⛶ Fullscreen',
+    fsNotSupported: 'Fullscreen is not supported in this browser: add to Home Screen or open directly in Safari.',
+    inputAria: 'Enter a positive integer',
+    demo: 'Demo ▶',
+    randTitle: 'Generate random number',
+    step: 'Step',
+    derivation: '📝 Derivation',
+    prev: '◀ Prev',
+    next: 'Next ▶',
+    play: '▶ Play',
+    pause: '⏸ Pause',
+    kbd: '← → Steps | + - 0 Zoom | G Diagram | E Formulas | P Play | F Fullscreen',
+    zoomOut: 'Zoom out',
+    zoomIn: 'Zoom in',
+    zoomReset: 'Reset 100%',
+    layVis: 'Diagram',
+    layEq: 'Formulas',
+    layReset: '↙ Reset',
+    valError: mx => `Please enter an integer from 1 to ${'9'.repeat(mx)} (up to ${mx} digits)`,
+    VN: {4:'1000',5:'10K',6:'100K'},
+    rules: {
+      '2': '<b>Divisible by 2:</b> If the last digit is 0, 2, 4, 6, or 8 (even), the number is divisible by 2.',
+      '4': '<b>Divisible by 4:</b> If the last 2 digits form a multiple of 4, the number is divisible by 4.',
+      '8': '<b>Divisible by 8:</b> If the last 3 digits form a multiple of 8, the number is divisible by 8.',
+      '3': '<b>Divisible by 3:</b> If the sum of its digits is a multiple of 3, the number is divisible by 3.',
+      '9': '<b>Divisible by 9:</b> If the sum of its digits is a multiple of 9, the number is divisible by 9.',
+      '11': '<b>Divisible by 11:</b> If the difference between (odd-position digits sum) and (even-position digits sum) is a multiple of 11 or 0.',
+      '7': '<b>Divisible by 7 (Bonus · 3-Digit Blocks):</b> Group digits by 3s from the right; if (Odd blocks sum − Even blocks sum) is a multiple of 7 or 0. (Up to 12 digits)'
+    }
+  }
+};
 
 /* ===== 方塊元件 ===== */
 function cell(cls,gc){const c=h('div','c '+(cls||''));if(gc){c.dataset.g=1;c.style.setProperty('--gc',gc)}return c}
@@ -268,7 +356,7 @@ const CUBE=(()=>{let s='<svg viewBox="0 0 140 140"><polygon class="tp" points="0
   for(let i=10;i<100;i+=10)s+=`<line x1="${i}" y1="40" x2="${i}" y2="140"/><line x1="0" y1="${40+i}" x2="100" y2="${40+i}"/><line x1="${i}" y1="40" x2="${i+40}" y2="0"/><line x1="100" y1="${40+i}" x2="140" y2="${i}"/>`;
   for(let j=1;j<10;j++)s+=`<line x1="${j*4}" y1="${40-j*4}" x2="${100+j*4}" y2="${40-j*4}"/><line x1="${100+j*4}" y1="${40-j*4}" x2="${100+j*4}" y2="${140-j*4}"/>`;
   return s+'</g><rect class="cn" x="90" y="130" width="10" height="10"/></svg>'})();
-function cube(mode,p,sm=SMALL){const w=h('div','cube'+(mode==='lit'?' cut':'')+(sm?' sm':''),CUBE);const cv=h('div','cv',VN[p]);cv.style.setProperty('--cc',COL[p]);w.append(cv);
+function cube(mode,p,sm=SMALL){const w=h('div','cube'+(mode==='lit'?' cut':'')+(sm?' sm':''),CUBE);const cv=h('div','cv',I18N[S.lang].VN[p]);cv.style.setProperty('--cc',COL[p]);w.append(cv);
   if(mode==='lit')w.append(lit(COL[p]));if(mode==='hole')w.append(cell('hole'));return w}
 function item(el,sub){const it=h('div','item');it.append(el);if(sub!==undefined)it.append(h('div','sub',sub||'&nbsp;'));return it}
 function part(label,items,note,big,style,sn){const p=h('div','part'+(big?' big':''));const l=h('div','pl',label);if(style)l.style.cssText=style;const w=h('div','items');items.forEach(x=>w.append(x));p.append(l,w);if(sn)p.append(h('div','sub',sn));if(note!==undefined)p.append(h('div','note',note||'&nbsp;'));return p}
@@ -299,116 +387,142 @@ async function move(src,tks,anim){const n=Math.min(src.length,tks.length);if(ani
 
 /* ===== 3、9 的倍數 ===== */
 function b39(k){return(n,vin)=>{
+  const en=S.lang==='en';
   const N=+n,D=digs(n),nz=D.filter(o=>o.d),sum=sumd(D),q=sum/k|0,r=sum%k,ok=!r;
   const g100=k===9?(r,c)=>r<9?A[c%2]:'#86efac':(r,c)=>r<9?A[(c+(r/3|0))%2]:['#86efac','#f9a8d4','#86efac'][c/3|0];
   const g10=k===9?()=>A[0]:i=>A[(i/3|0)%2];
   const parts=nz.map(o=>{
-    if(o.p>=4)return part(`${o.d} 個 ${o.v}`,rep(o.d,()=>item(cube('lit',o.p),'+1')),`${o.v-1} = ${k}×${(o.v-1)/k}`,1,stl(o.p),`${o.v} = ${o.v-1} + 1`);
-    if(o.p===3)return part(`${o.d} 個 100`,rep(o.d,()=>item(hundred(g100,1),'99 + 1')),`99 = ${k}×${99/k}（${99/k} 組）`,1,stl(3));
-    if(o.p===2)return part(`${o.d} 個 10`,rep(o.d,()=>item(ten(g10,1),'9 + 1')),`9 = ${k}×${9/k}`,1,stl(2));
-    return part(`${o.d} 個 1`,[item(ones(o.d),'')],'',0,stl(1))});
+    if(o.p>=4)return part(en?`${o.d} × ${o.v}`:`${o.d} 個 ${o.v}`,rep(o.d,()=>item(cube('lit',o.p),'+1')),`${o.v-1} = ${k}×${(o.v-1)/k}`,1,stl(o.p),`${o.v} = ${o.v-1} + 1`);
+    if(o.p===3)return part(en?`${o.d} × 100`:`${o.d} 個 100`,rep(o.d,()=>item(hundred(g100,1),'99 + 1')),en?`99 = ${k}×${99/k} (${99/k} groups)`:`99 = ${k}×${99/k}（${99/k} 組）`,1,stl(3));
+    if(o.p===2)return part(en?`${o.d} × 10`:`${o.d} 個 10`,rep(o.d,()=>item(ten(g10,1),'9 + 1')),`9 = ${k}×${9/k}`,1,stl(2));
+    return part(en?`${o.d} × 1`:`${o.d} 個 1`,[item(ones(o.d),'')],'',0,stl(1))});
   const list=[];D.forEach(o=>{for(let i=0;i<o.d;i++)list.push(COL[o.p])});
-  const T=tray('🧺 「多出來的 1」集合區');const tks=groups(T.b,list,k,3);
-  const vd=h('div','vd '+(ok?'ok':'no'),ok?`✓ ${sum} 是 ${k} 的倍數 → ${N} 是 ${k} 的倍數`:`✗ ${sum} = ${k}×${q} + ${r} → ${N} 不是 ${k} 的倍數`);
+  const T=tray(en?'🧺 Collected Extra 1s':'🧺 「多出來的 1」集合區');const tks=groups(T.b,list,k,3);
+  const vd=h('div','vd '+(ok?'ok':'no'),en
+    ?(ok?`✓ ${sum} is a multiple of ${k} → ${N} is divisible by ${k}`:`✗ ${sum} = ${k}×${q} + ${r} → ${N} is not divisible by ${k}`)
+    :(ok?`✓ ${sum} 是 ${k} 的倍數 → ${N} 是 ${k} 的倍數`:`✗ ${sum} = ${k}×${q} + ${r} → ${N} 不是 ${k} 的倍數`));
   T.t.append(vd);vin.append(row(parts),T.t);
   const hi=nz.filter(o=>o.p>1),se=D.map(o=>C(o.d,o.p)).join('+');
   const r0=`${N} = `+nz.map(o=>o.p>1?`${C(o.d,o.p)}×${o.v}`:C(o.d,1)).join(' + ');
   const r1=`= `+nz.map(o=>o.p>1?`${C(o.d,o.p)}×(${o.v-1}+1)`:C(o.d,1)).join(' + ');
   const r2=`= `+nz.map(o=>o.p>1?`${C(o.d,o.p)}×${o.v-1} + ${C(o.d,o.p)}`:C(o.d,1)).join(' + ');
-  const r3=hi.length?hi.map(o=>`${o.v-1} = ${k}×${(o.v-1)/k}`).join('、')+` → 都是 ${k} 的倍數`:'沒有十位以上的數';
+  const r3=hi.length?hi.map(o=>`${o.v-1} = ${k}×${(o.v-1)/k}`).join(en?', ':'、')+(en?` → all multiples of ${k}`:` → 都是 ${k} 的倍數`):(en?'No tens or higher digits':'沒有十位以上的數');
   const big=hi.map(o=>`${C(o.d,o.p)}×${o.v-1}`).join(' + ')||'0';
   const r4=`= <span class="ug">${big}</span> + <span class="um">(${se})</span>`;
-  const r5=`<span class="tg">${k} 的倍數</span> 不用管，只看 ${se} = <b>${sum}</b>`;
-  const r6=`<span class="${ok?'okc':'noc'}">${sum} = ${k}×${q}${r?' + '+r:''} → ${N} ${ok?'是':'不是'} ${k} 的倍數 ${ok?'✓':'✗'}</span>`;
+  const r5=en?`Ignore <span class="tg">multiples of ${k}</span>, only check ${se} = <b>${sum}</b>`:`<span class="tg">${k} 的倍數</span> 不用管，只看 ${se} = <b>${sum}</b>`;
+  const r6=en
+    ?`<span class="${ok?'okc':'noc'}">${sum} = ${k}×${q}${r?' + '+r:''} → ${N} is ${ok?'':'not '}divisible by ${k} ${ok?'✓':'✗'}</span>`
+    :`<span class="${ok?'okc':'noc'}">${sum} = ${k}×${q}${r?' + '+r:''} → ${N} ${ok?'是':'不是'} ${k} 的倍數 ${ok?'✓':'✗'}</span>`;
   const bigs=hi.filter(o=>o.p>=4).map(o=>`${o.v-1} = ${k}×${(o.v-1)/k}`);
-  const gcap=(k===9?'同顏色 = 9 個一組：99 → 11 組（10 直排 + 最下面 1 橫排）、9 → 1 組':'同顏色 = 3 個一組：99 → 33 組、9 → 3 組')+(bigs.length?'；'+bigs.join('、'):'')+'，全部剛好分完！';
+  const gcapZh=(k===9?'同顏色 = 9 個一組：99 → 11 組（10 直排 + 最下面 1 橫排）、9 → 1 組':'同顏色 = 3 個一組：99 → 33 組、9 → 3 組')+(bigs.length?'；'+bigs.join('、'):'')+'，全部剛好分完！';
+  const gcapEn=(k===9?'Same color = groups of 9: 99 → 11 groups (10 cols + 1 bottom row), 9 → 1 group':'Same color = groups of 3: 99 → 33 groups, 9 → 3 groups')+(bigs.length?'; '+bigs.join(', '):'')+', all grouped evenly!';
   return{steps:[
-    {cap:`把 ${N} 拆成：${nz.map(o=>`${o.d} 個 ${o.v}`).join('、')}`,rows:[r0]},
-    {cap:hi.length?`關鍵：${hi.map(o=>`${o.v} = ${o.v-1} + 1`).join('、')}，亮起來的方塊就是「多出來的 1」`:'個位數直接看',rows:[r1,r2],go:async a=>{vin.classList.add('split');if(a){vin.classList.add('pulse');await sleep(950);vin.classList.remove('pulse')}}},
-    {cap:gcap,rows:[r3],go:async()=>vin.classList.add('grp')},
-    {cap:`把多出來的 1 集合起來：${D.map(o=>o.d).join(' + ')} = ${sum} 個，剛好就是「各位數字和」！`,rows:[r4],go:async a=>{T.hd.innerHTML=`🧺 多出來的 1：${se} = <b>${sum}</b> 個`;await move([...vin.querySelectorAll('.blocks .c.lit,.blocks .c.u1')],tks,a)}},
-    {cap:`分好組的大塊一定是 ${k} 的倍數，不用管它！`,rows:[r5],go:async()=>vin.classList.add('done')},
-    {cap:ok?`${sum} 個剛好 ${k} 個 ${k} 個分完 → ${N} 是 ${k} 的倍數 ✓`:`${sum} 個分成 ${q} 組還剩 ${r} 個 → ${N} 不是 ${k} 的倍數 ✗（${N} 除以 ${k} 也餘 ${r}）`,rows:[r6],go:async()=>{T.t.classList.add('grouped');vd.classList.add('show')}}
+    {cap:en?`Decompose ${N} into: ${nz.map(o=>`${o.d} × ${o.v}`).join(', ')}`:`把 ${N} 拆成：${nz.map(o=>`${o.d} 個 ${o.v}`).join('、')}`,rows:[r0]},
+    {cap:hi.length?(en?`Key: ${hi.map(o=>`${o.v} = ${o.v-1} + 1`).join(', ')}. The highlighted blocks are the extra 1s.`:`關鍵：${hi.map(o=>`${o.v} = ${o.v-1} + 1`).join('、')}，亮起來的方塊就是「多出來的 1」`):(en?'Examine the ones digit directly':'個位數直接看'),rows:[r1,r2],go:async a=>{vin.classList.add('split');if(a){vin.classList.add('pulse');await sleep(950);vin.classList.remove('pulse')}}},
+    {cap:en?gcapEn:gcapZh,rows:[r3],go:async()=>vin.classList.add('grp')},
+    {cap:en?`Collect the extra 1s: ${D.map(o=>o.d).join(' + ')} = ${sum}. This is exactly the "sum of digits"!`:`把多出來的 1 集合起來：${D.map(o=>o.d).join(' + ')} = ${sum} 個，剛好就是「各位數字和」！`,rows:[r4],go:async a=>{T.hd.innerHTML=en?`🧺 Extra 1s: ${se} = <b>${sum}</b>`: `🧺 多出來的 1：${se} = <b>${sum}</b> 個`;await move([...vin.querySelectorAll('.blocks .c.lit,.blocks .c.u1')],tks,a)}},
+    {cap:en?`Grouped blocks are guaranteed multiples of ${k}; we can ignore them!`:`分好組的大塊一定是 ${k} 的倍數，不用管它！`,rows:[r5],go:async()=>vin.classList.add('done')},
+    {cap:en
+      ?(ok?`${sum} divides evenly into groups of ${k} → ${N} is divisible by ${k} ✓`:`${sum} makes ${q} groups of ${k} with ${r} remaining → ${N} is not divisible by ${k} ✗ (${N} mod ${k} = ${r})`)
+      :(ok?`${sum} 個剛好 ${k} 個 ${k} 個分完 → ${N} 是 ${k} 的倍數 ✓`:`${sum} 個分成 ${q} 組還剩 ${r} 個 → ${N} 不是 ${k} 的倍數 ✗（${N} 除以 ${k} 也餘 ${r}）`),rows:[r6],go:async()=>{T.t.classList.add('grouped');vd.classList.add('show')}}
   ]};
 }}
 
 /* ===== 2、4、8 的倍數 ===== */
 function bTail(k){return(n,vin)=>{
+  const en=S.lang==='en';
   const N=+n,dc={2:1,4:2,8:3}[k],base=10**dc,pre=Math.floor(N/base),tail=N%base,q=tail/k|0,r=tail%k,ok=!r;
-  const D=digs(n),nz=D.filter(o=>o.d),ts=N>=base?String(tail).padStart(dc,'0'):String(tail),dn=['','個位','末兩位','末三位'][dc];
+  const D=digs(n),nz=D.filter(o=>o.d),ts=N>=base?String(tail).padStart(dc,'0'):String(tail);
+  const dn=en?['','last digit','last 2 digits','last 3 digits'][dc]:['','個位','末兩位','末三位'][dc];
+  const dnCap=en?['','Last digit','Last 2 digits','Last 3 digits'][dc]:['','個位','末兩位','末三位'][dc];
   const gP=(r,c)=>A[(r+(c>>1))%2],gQ=(r,c)=>A[((r>>1)+(c>>1))%2];
   const safe=[],tp=[];
   nz.forEach(o=>{
     if(o.p>dc){
-      if(o.p>=4)safe.push(part(`${o.d} 個 ${o.v}`,rep(o.d,()=>item(cube(null,o.p))),`${o.v} = ${k}×${o.v/k}`,1,stl(o.p)));
-      else if(o.p===3)safe.push(part(`${o.d} 個 100`,rep(o.d,()=>item(hundred(k===2?gP:gQ))),`100 = ${k}×${100/k}（${100/k} 組）`,1,stl(3)));
-      else safe.push(part(`${o.d} 個 10`,rep(o.d,()=>item(ten(i=>A[(i>>1)%2]))),'10 = 2×5（5 組）',1,stl(2)));
+      if(o.p>=4)safe.push(part(en?`${o.d} × ${o.v}`:`${o.d} 個 ${o.v}`,rep(o.d,()=>item(cube(null,o.p))),`${o.v} = ${k}×${o.v/k}`,1,stl(o.p)));
+      else if(o.p===3)safe.push(part(en?`${o.d} × 100`:`${o.d} 個 100`,rep(o.d,()=>item(hundred(k===2?gP:gQ))),en?`100 = ${k}×${100/k} (${100/k} groups)`:`100 = ${k}×${100/k}（${100/k} 組）`,1,stl(3)));
+      else safe.push(part(en?`${o.d} × 10`:`${o.d} 個 10`,rep(o.d,()=>item(ten(i=>A[(i>>1)%2]))),en?'10 = 2×5 (5 groups)':'10 = 2×5（5 組）',1,stl(2)));
     }else{
-      if(o.p===3)tp.push(part(`${o.d} 個 100`,rep(o.d,()=>item(hundred())),undefined,0,stl(3)));
-      else if(o.p===2)tp.push(part(`${o.d} 個 10`,rep(o.d,()=>item(ten())),undefined,0,stl(2)));
-      else tp.push(part(`${o.d} 個 1`,[item(ones(o.d))],undefined,0,stl(1)));
+      if(o.p===3)tp.push(part(en?`${o.d} × 100`:`${o.d} 個 100`,rep(o.d,()=>item(hundred())),undefined,0,stl(3)));
+      else if(o.p===2)tp.push(part(en?`${o.d} × 10`:`${o.d} 個 10`,rep(o.d,()=>item(ten())),undefined,0,stl(2)));
+      else tp.push(part(en?`${o.d} × 1`:`${o.d} 個 1`,[item(ones(o.d))],undefined,0,stl(1)));
     }});
-  const tw=h('div','tw'),twl=h('div','twl',`${dn}：${ts}`);tw.append(twl,tp.length?row(tp):h('div','zero','0'));
+  const tw=h('div','tw'),twl=h('div','twl',`${dnCap}：${ts}`);tw.append(twl,tp.length?row(tp):h('div','zero','0'));
   const b=row(safe);if(safe.length)b.append(h('div','plus','+'));b.append(tw);vin.append(b);
   [...tw.querySelectorAll('.c')].forEach((c,i)=>{const g=i/k|0;if(g<q){c.dataset.t=1;c.style.setProperty('--tcol',TC[g%3])}else c.classList.add('rm')});
   let oe=null;
-  if(k===2){oe=h('div','oe','個位：'+rep(10,d=>`<span class="${d%2?'od':'ev'}${d===tail?' me':''}">${d}</span>`).join('')+'<span class="ev">偶數 = 2 的倍數</span><span class="od">奇數 = 2 的倍數 + 1</span>');vin.append(oe)}
-  const vd=h('div','vd '+(ok?'ok':'no'),ok?`✓ ${dn} ${ts} = ${k}×${q} → ${N} 是 ${k} 的倍數`:`✗ ${dn} ${ts} = ${k}×${q} + ${r} → ${N} 不是 ${k} 的倍數`);
+  if(k===2){
+    oe=h('div','oe',(en?'Last digit: ':'個位：')+rep(10,d=>`<span class="${d%2?'od':'ev'}${d===tail?' me':''}">${d}</span>`).join('')+(en?'<span class="ev">Even = 2k</span><span class="od">Odd = 2k + 1</span>':'<span class="ev">偶數 = 2 的倍數</span><span class="od">奇數 = 2 的倍數 + 1</span>'));
+    vin.append(oe);
+  }
+  const vd=h('div','vd '+(ok?'ok':'no'),en
+    ?(ok?`✓ ${dnCap} ${ts} = ${k}×${q} → ${N} is divisible by ${k}`:`✗ ${dnCap} ${ts} = ${k}×${q} + ${r} → ${N} is not divisible by ${k}`)
+    :(ok?`✓ ${dn} ${ts} = ${k}×${q} → ${N} 是 ${k} 的倍數`:`✗ ${dn} ${ts} = ${k}×${q} + ${r} → ${N} 不是 ${k} 的倍數`));
   vin.append(vd);
   const r0=`${N} = `+nz.map(o=>o.p>1?`${C(o.d,o.p)}×${o.v}`:C(o.d,1)).join(' + ');
-  const r1=pre?`= ${pre}×${base} + <b class="pk">${ts}</b>`:`${N} 只有${dn}`;
+  const r1=pre?`= ${pre}×${base} + <b class="pk">${ts}</b>`:(en?`${N} only has ${dn}`:`${N} 只有${dn}`);
   const r2=`${base} = ${k}×${base/k}`;
-  const r3=pre?`${pre}×${base} = ${pre}×${base/k}×${k} → <span class="tg">${k} 的倍數</span>`:'沒有更高的位';
-  const r4=k===2?`個位 ${tail} = 2×${q}${r?' + 1':''} → <b>${r?'奇數':'偶數'}</b>`:`只看${dn}：<b class="pk">${ts}</b> = ${k}×${q}${r?' + '+r:''}`;
-  const r5=`<span class="${ok?'okc':'noc'}">${N} ${ok?'是':'不是'} ${k} 的倍數 ${ok?'✓':'✗'}</span>`;
-  const capSafe={2:'10 = 2×5、100 = 2×50…：同顏色 2 個一對，全部剛好配完（1000、1萬、10萬 也都是 2 的倍數）',4:'100 = 4×25：同顏色 4 個（2×2）一組，剛好 25 組；1000、1萬、10萬 都是 100 的倍數，也都能分完',8:'1000 = 8×125：每個 1000 都能 8 個 8 個分完；1萬、10萬 是 1000 的倍數也一樣（100 不行，所以要看末三位）'}[k];
+  const r3=pre?(en?`${pre}×${base} = ${pre}×${base/k}×${k} → <span class="tg">Multiple of ${k}</span>`:`${pre}×${base} = ${pre}×${base/k}×${k} → <span class="tg">${k} 的倍數</span>`):(en?'No higher digits':'沒有更高的位');
+  const r4=k===2
+    ?(en?`Last digit ${tail} = 2×${q}${r?' + 1':''} → <b>${r?'Odd':'Even'}</b>`:`個位 ${tail} = 2×${q}${r?' + 1':''} → <b>${r?'奇數':'偶數'}</b>`)
+    :(en?`Only check ${dn}: <b class="pk">${ts}</b> = ${k}×${q}${r?' + '+r:''}`:`只看${dn}：<b class="pk">${ts}</b> = ${k}×${q}${r?' + '+r:''}`);
+  const r5=en
+    ?`<span class="${ok?'okc':'noc'}">${N} is ${ok?'':'not '}divisible by ${k} ${ok?'✓':'✗'}</span>`
+    :`<span class="${ok?'okc':'noc'}">${N} ${ok?'是':'不是'} ${k} 的倍數 ${ok?'✓':'✗'}</span>`;
+  const capSafeZh={2:'10 = 2×5、100 = 2×50…：同顏色 2 個一對，全部剛好配完（1000、1萬、10萬 也都是 2 的倍數）',4:'100 = 4×25：同顏色 4 個（2×2）一組，剛好 25 組；1000、1萬、10萬 都是 100 的倍數，也都能分完',8:'1000 = 8×125：每個 1000 都能 8 個 8 個分完；1萬、10萬 是 1000 的倍數也一樣（100 不行，所以要看末三位）'}[k];
+  const capSafeEn={2:'10 = 2×5, 100 = 2×50... Paired in twos by color, all divide evenly (1000, 10K, 100K are also multiples of 2)',4:'100 = 4×25: 4 blocks (2×2) per group, 25 groups total. 1000, 10K, 100K are multiples of 100 so they also divide evenly',8:'1000 = 8×125: Every 1000 divides into groups of 8. 10K, 100K are multiples of 1000 (100 cannot, which is why we must check the last 3 digits)'}[k];
   return{steps:[
-    {cap:`把 ${N} 拆開，粉紅虛線框裡是「${dn}」`,rows:[r0,r1]},
-    {cap:safe.length?capSafe:`${N} 沒有比${dn}更高的位`,rows:pre?[r2]:[],go:async()=>vin.classList.add('grp')},
-    {cap:pre?`前面的 ${pre}×${base} 一定是 ${k} 的倍數 → 不用管，只看${dn}！`:`直接看${dn}`,rows:[r3],go:async()=>vin.classList.add('done')},
-    {cap:k===2?`個位 ${tail} 個方塊兩個兩個配對 → ${r?'剩 1 個，是奇數':'剛好配完，是偶數'}`:`${dn} ${ts} 個方塊每 ${k} 個一組 → ${q} 組，剩 ${r} 個`,rows:[r4],go:async()=>{vin.classList.add('tgr');twl.innerHTML=`${dn}：${ts} = ${k}×${q}${r?' + '+r:''}`;oe&&oe.classList.add('show')}},
-    {cap:k===2?`個位是 ${tail}（${r?'奇':'偶'}數）→ ${N} ${ok?'是':'不是'} 2 的倍數 ${ok?'✓':'✗'}`:`${dn} ${ok?'能':'不能'}被 ${k} 整除 → ${N} ${ok?'是':'不是'} ${k} 的倍數 ${ok?'✓':'✗'}`,rows:[r5],go:async()=>vd.classList.add('show')}
+    {cap:en?`Decompose ${N}. The pink dashed box highlights the "${dn}".`:`把 ${N} 拆開，粉紅虛線框裡是「${dn}」`,rows:[r0,r1]},
+    {cap:safe.length?(en?capSafeEn:capSafeZh):(en?`${N} has no digits higher than ${dn}`:`${N} 沒有比${dn}更高的位`),rows:pre?[r2]:[],go:async()=>vin.classList.add('grp')},
+    {cap:pre?(en?`The leading ${pre}×${base} is a multiple of ${k} → Ignore it, only check the ${dn}!`:`前面的 ${pre}×${base} 一定是 ${k} 的倍數 → 不用管，只看${dn}！`):(en?`Examine the ${dn} directly`:`直接看${dn}`),rows:[r3],go:async()=>vin.classList.add('done')},
+    {cap:k===2?(en?`Pairing up ${tail} ones: ${r?'1 left over (Odd)':'perfectly paired (Even)'}`:`個位 ${tail} 個方塊兩個兩個配對 → ${r?'剩 1 個，是奇數':'剛好配完，是偶數'}`):(en?`Grouping the ${ts} ones in sets of ${k} → ${q} groups, ${r} left over`:`${dn} ${ts} 個方塊每 ${k} 個一組 → ${q} 組，剩 ${r} 個`),rows:[r4],go:async()=>{vin.classList.add('tgr');twl.innerHTML=`${dnCap}：${ts} = ${k}×${q}${r?' + '+r:''}`;oe&&oe.classList.add('show')}},
+    {cap:k===2?(en?`Last digit is ${tail} (${r?'Odd':'Even'}) → ${N} is ${ok?'':'not '}divisible by 2 ${ok?'✓':'✗'}`:`個位是 ${tail}（${r?'奇':'偶'}數）→ ${N} ${ok?'是':'不是'} 2 的倍數 ${ok?'✓':'✗'}`):(en?`${dnCap} ${ok?'is':'is not'} divisible by ${k} → ${N} is ${ok?'':'not '}divisible by ${k} ${ok?'✓':'✗'}`:`${dn} ${ok?'能':'不能'}被 ${k} 整除 → ${N} ${ok?'是':'不是'} ${k} 的倍數 ${ok?'✓':'✗'}`),rows:[r5],go:async()=>vd.classList.add('show')}
   ]};
 }}
 
 /* ===== 11 的倍數 ===== */
 function b11(n,vin){
+  const en=S.lang==='en';
   const N=+n,D=digs(n),nz=D.filter(o=>o.d),odd=D.filter(o=>o.p%2),even=D.filter(o=>!(o.p%2));
   const os=sumd(odd),es=sumd(even),m=Math.min(os,es),diff=Math.abs(os-es),ok=diff%11===0;
   const core=o=>o.p%2?o.v-1:o.v+1;
-  const parts=nz.map(o=>{const od=o.p%2,lab=`${o.d} 個 ${o.v}<small>（第${o.p}位・${od?'奇':'偶'}）</small>`,st=od?'background:#dbeafe;color:#1d4ed8':'background:#fce7f3;color:#be185d';
+  const parts=nz.map(o=>{const od=o.p%2,lab=en?`${o.d} × ${o.v}<small> (Pos ${o.p} · ${od?'Odd':'Even'})</small>`:`${o.d} 個 ${o.v}<small>（第${o.p}位・${od?'奇':'偶'}）</small>`,st=od?'background:#dbeafe;color:#1d4ed8':'background:#fce7f3;color:#be185d';
     if(o.p>=4)return part(lab,rep(o.d,()=>item(cube(od?'lit':'hole',o.p),od?'+1':'−1')),`${core(o)} = 11×${core(o)/11}`,1,st,`${o.v} = ${core(o)} ${od?'+':'−'} 1`);
-    if(o.p===3)return part(lab,rep(o.d,()=>item(hundred((r,c)=>PAL[r<9?r:c],1),'99 + 1')),'99 = 11×9（9 組）',1,st);
+    if(o.p===3)return part(lab,rep(o.d,()=>item(hundred((r,c)=>PAL[r<9?r:c],1),'99 + 1')),en?'99 = 11×9 (9 groups)':'99 = 11×9（9 組）',1,st);
     if(o.p===2)return part(lab,rep(o.d,()=>item(ten(()=>'#fcd34d',0,1),'11 − 1')),'11 = 11×1',1,st);
     return part(lab,[item(ones(o.d),'+ '+o.d)],'',0,st)});
   const pl=[],ml=[];D.forEach(o=>{for(let i=0;i<o.d;i++)(o.p%2?pl:ml).push(o.p%2?COL[o.p]:'neg')});
   function side(list,title,cls){const T=tray(title,cls),tks=[];
     if(!list.length)T.b.append(h('div','zero','0'));
-    if(m){const cw=h('div','cw'),cb=h('div','cb');cb.style.setProperty('--gcols',Math.min(6,m));list.slice(0,m).forEach(c=>{const t=tok(c);cb.append(t);tks.push(t)});cw.append(cb,h('div','cn2',`↔ 抵消 ${m} 個`));T.b.append(cw)}
+    if(m){const cw=h('div','cw'),cb=h('div','cb');cb.style.setProperty('--gcols',Math.min(6,m));list.slice(0,m).forEach(c=>{const t=tok(c);cb.append(t);tks.push(t)});cw.append(cb,h('div','cn2',en?`↔ Cancel ${m}`:`↔ 抵消 ${m} 個`));T.b.append(cw)}
     if(list.length>m)tks.push(...groups(T.b,list.slice(m),11,6));
     return{T,tks}}
-  const P=side(pl,'＋ 多出來的 1（奇數位：第1、3、5位）','pl1'),M=side(ml,'− 少掉的 1（偶數位：第2、4、6位）','mi1');
+  const P=side(pl,en?'＋ Extra 1s (Odd pos: 1st, 3rd, 5th)':'＋ 多出來的 1（奇數位：第1、3、5位）','pl1'),M=side(ml,en?'− Missing 1s (Even pos: 2nd, 4th, 6th)':'− 少掉的 1（偶數位：第2、4、6位）','mi1');
   const trays=h('div','trays');trays.append(P.T.t,M.T.t);
-  const why=diff===0?'差是 0':ok?'差是 11 的倍數':'差不是 11 的倍數或 0';
-  const vd=h('div','vd '+(ok?'ok':'no'),`${Math.max(os,es)} − ${m} = ${diff}，${why} → ${N} ${ok?'是':'不是'} 11 的倍數 ${ok?'✓':'✗'}`);
+  const why=en?(diff===0?'Difference is 0':ok?'Difference is a multiple of 11':'Difference is not a multiple of 11 or 0'):(diff===0?'差是 0':ok?'差是 11 的倍數':'差不是 11 的倍數或 0');
+  const vd=h('div','vd '+(ok?'ok':'no'),en
+    ?`${Math.max(os,es)} − ${m} = ${diff} (${why}) → ${N} is ${ok?'':'not '}divisible by 11 ${ok?'✓':'✗'}`
+    :`${Math.max(os,es)} − ${m} = ${diff}，${why} → ${N} ${ok?'是':'不是'} 11 的倍數 ${ok?'✓':'✗'}`);
   vin.append(row(parts),trays,vd);
   const oex=odd.map(o=>C(o.d,o.p)).join('+')||'0',eex=even.map(o=>C(o.d,o.p)).join('+')||'0';
   const hi=nz.filter(o=>o.p>1);
   const r0=`${N} = `+nz.map(o=>o.p>1?`${C(o.d,o.p)}×${o.v}`:C(o.d,1)).join(' + ');
   const r1=`= `+nz.map(o=>o.p===1?C(o.d,1):`${C(o.d,o.p)}×(${core(o)}${o.p%2?'+':'−'}1)`).join(' + ');
-  const r2=hi.length?hi.map(o=>`${core(o)} = 11×${core(o)/11}`).join('、')+' → 都是 11 的倍數':'沒有十位以上的數';
-  const r3=`= <span class="ug">11 的倍數</span> + <span class="bl">(${oex})</span> − <span class="pk">(${eex})</span>`;
-  const r4=`奇數位和 <b class="bl">${os}</b>，偶數位和 <b class="pk">${es}</b>`;
-  const r5=`<span class="${ok?'okc':'noc'}">${Math.max(os,es)} − ${m} = ${diff}（${why}）→ ${N} ${ok?'是':'不是'} 11 的倍數 ${ok?'✓':'✗'}</span>`;
-  const c1=hi.map(o=>`${o.v} = ${core(o)} ${o.p%2?'+':'−'} 1`).join('、');
-  const c2=hi.map(o=>o.p===3?'99 → 9 組（每橫排 10 個 + 最下面 1 個）':o.p===2?'10 補 1 個變 11':`${core(o)} = 11×${core(o)/11}`).join('、');
+  const r2=hi.length?hi.map(o=>`${core(o)} = 11×${core(o)/11}`).join(en?', ':'、')+(en?' → all multiples of 11':' → 都是 11 的倍數'):(en?'No digits above ones':'沒有十位以上的數');
+  const r3=en?`= <span class="ug">Multiples of 11</span> + <span class="bl">(${oex})</span> − <span class="pk">(${eex})</span>`:`= <span class="ug">11 的倍數</span> + <span class="bl">(${oex})</span> − <span class="pk">(${eex})</span>`;
+  const r4=en?`Odd-position sum <b class="bl">${os}</b>, Even-position sum <b class="pk">${es}</b>`:`奇數位和 <b class="bl">${os}</b>，偶數位和 <b class="pk">${es}</b>`;
+  const r5=en
+    ?`<span class="${ok?'okc':'noc'}">${Math.max(os,es)} − ${m} = ${diff} (${why}) → ${N} is ${ok?'':'not '}divisible by 11 ${ok?'✓':'✗'}</span>`
+    :`<span class="${ok?'okc':'noc'}">${Math.max(os,es)} − ${m} = ${diff}（${why}）→ ${N} ${ok?'是':'不是'} 11 的倍數 ${ok?'✓':'✗'}</span>`;
+  const c1=hi.map(o=>`${o.v} = ${core(o)} ${o.p%2?'+':'−'} 1`).join(en?', ':'、');
+  const c2=hi.map(o=>o.p===3?(en?'99 → 9 groups (10 per row + 1 on bottom)':'99 → 9 組（每橫排 10 個 + 最下面 1 個）'):o.p===2?(en?'10 + 1 = 11':'10 補 1 個變 11'):`${core(o)} = 11×${core(o)/11}`).join(en?', ':'、');
   return{steps:[
-    {cap:'從個位（最右邊）開始數：第 1、3、5 位是奇數位（藍），第 2、4、6 位是偶數位（粉紅）',rows:[r0]},
-    {cap:`關鍵：${c1} → 奇數位「多 1」，偶數位「少 1」（紅虛線）`,rows:[r1],go:async a=>{vin.classList.add('split');if(a){vin.classList.add('pulse');await sleep(950);vin.classList.remove('pulse')}}},
-    {cap:`同顏色 = 11 個一組：${c2}`,rows:[r2],go:async()=>vin.classList.add('grp')},
-    {cap:'多出來的 1 放進「＋」區，少掉的 1 放進「−」區',rows:[r3],go:async a=>{await Promise.all([move([...vin.querySelectorAll('.blocks .c.lit,.blocks .c.u1')],P.tks,a),move([...vin.querySelectorAll('.blocks .c.hole')],M.tks,a)])}},
-    {cap:`大塊都是 11 的倍數不用管；＋${os} 個和 −${es} 個互相抵消 ${m} 個`,rows:[r4],go:async()=>{vin.classList.add('done');trays.classList.add('cancel')}},
-    {cap:`剩下 ${diff} 個 → ${why} → ${N} ${ok?'是':'不是'} 11 的倍數 ${ok?'✓':'✗'}`,rows:[r5],go:async()=>{P.T.t.classList.add('grouped');M.T.t.classList.add('grouped');vd.classList.add('show')}}
+    {cap:en?'Count from the right (ones place): Positions 1, 3, 5 are Odd (Blue), positions 2, 4, 6 are Even (Pink)':'從個位（最右邊）開始數：第 1、3、5 位是奇數位（藍），第 2、4、6 位是偶數位（粉紅）',rows:[r0]},
+    {cap:en?`Key: ${c1} → Odd positions have "+1", Even positions have "−1" (red dashed)`:`關鍵：${c1} → 奇數位「多 1」，偶數位「少 1」（紅虛線）`,rows:[r1],go:async a=>{vin.classList.add('split');if(a){vin.classList.add('pulse');await sleep(950);vin.classList.remove('pulse')}}},
+    {cap:en?`Same color = groups of 11: ${c2}`:`同顏色 = 11 個一組：${c2}`,rows:[r2],go:async()=>vin.classList.add('grp')},
+    {cap:en?'Place extra 1s into "＋" box, and missing 1s into "−" box':'多出來的 1 放進「＋」區，少掉的 1 放進「−」區',rows:[r3],go:async a=>{await Promise.all([move([...vin.querySelectorAll('.blocks .c.lit,.blocks .c.u1')],P.tks,a),move([...vin.querySelectorAll('.blocks .c.hole')],M.tks,a)])}},
+    {cap:en?`Multiples of 11 are ignored; +${os} and −${es} cancel out ${m} pairs`:`大塊都是 11 的倍數不用管；＋${os} 個和 −${es} 個互相抵消 ${m} 個`,rows:[r4],go:async()=>{vin.classList.add('done');trays.classList.add('cancel')}},
+    {cap:en?`Remainder ${diff} → ${why} → ${N} is ${ok?'':'not '}divisible by 11 ${ok?'✓':'✗'}`:`剩下 ${diff} 個 → ${why} → ${N} ${ok?'是':'不是'} 11 的倍數 ${ok?'✓':'✗'}`,rows:[r5],go:async()=>{P.T.t.classList.add('grouped');M.T.t.classList.add('grouped');vd.classList.add('show')}}
   ]};
 }
 
@@ -422,6 +536,7 @@ function svg1001(){
     s+=`<text x="${x+bw/2}" y="${H-2}" font-size="12" font-weight="900" text-anchor="middle" fill="#334155">143</text>`}
   return s+'</svg>'}
 function svg7(Aa){
+  const en=S.lang==='en';
   const T=Aa/70|0,rest=Aa-T*70,bars=Math.ceil(rest/7),bw=12,flatW=10*bw+10,rowH=7*12+18;
   const fpr=Math.min(5,T)||0,frows=T?Math.ceil(T/fpr):0;
   const bpr=Math.max(1,Math.min(bars,Math.max(10,fpr*11))),brows=bars?Math.ceil(bars/bpr):0;
@@ -431,16 +546,18 @@ function svg7(Aa){
   for(let f=0;f<T;f++){const x0=(f%fpr)*flatW,y0=(f/fpr|0)*rowH;
     for(let c=0;c<10;c++)for(let j=0;j<7;j++)s+=`<rect x="${x0+c*bw+2}" y="${y0+j*12}" width="10" height="10" fill="${A[(f+c)%2]}" stroke="#334155" stroke-width=".6" rx="1.5"/>`;
     s+=`<rect x="${x0}" y="${y0-2}" width="${10*bw+2}" height="${7*12+2}" fill="none" stroke="#16a34a" stroke-width="2" rx="3"/>`;
-    s+=`<text x="${x0+5*bw+2}" y="${y0+7*12+13}" font-size="12" font-weight="900" text-anchor="middle" fill="#15803d">70（10 組）</text>`}
+    s+=`<text x="${x0+5*bw+2}" y="${y0+7*12+13}" font-size="12" font-weight="900" text-anchor="middle" fill="#15803d">${en?'70 (10 sets)':'70（10 組）'}</text>`}
   const by=frows*rowH;
   for(let b=0;b<bars;b++){const x=(b%bpr)*bw+2,y0=by+(b/bpr|0)*rowH,n=Math.min(7,rest-b*7),rm=n<7;
     for(let j=0;j<n;j++)rm?s+=`<rect x="${x}" y="${y0+j*12}" width="10" height="10" fill="#fee2e2" stroke="#dc2626" stroke-dasharray="2 1" rx="1.5"/>`:s+=`<rect x="${x}" y="${y0+j*12}" width="10" height="10" fill="${A[b%2]}" stroke="#334155" stroke-width=".6" rx="1.5"/>`;
-    if(rm)s+=`<text x="${x+5}" y="${y0+7*12+12}" font-size="11" font-weight="900" text-anchor="middle" fill="#dc2626">剩${n}</text>`;
+    if(rm)s+=`<text x="${x+5}" y="${y0+7*12+12}" font-size="11" font-weight="900" text-anchor="middle" fill="#dc2626">${en?`${n} rem`:`剩${n}`}</text>`;
     else if((b+1)%5===0||b===bars-1)s+=`<text x="${x+5}" y="${y0+7*12+12}" font-size="11" font-weight="900" text-anchor="middle" fill="#334155">${T*10+b+1}</text>`}
   return s+'</svg>'}
 function b7(n,vin){
+  const en=S.lang==='en';
   const N=+n,s=String(n),G=[];
-  const UN=['個','千','百萬','十億'],UV=['','1,000','1,000,000','1,000,000,000'],ID=['','1001−1','1001×999+1','1001×999001−1'];
+  const UN=en?['Ones','Thousands','Millions','Billions']:['個','千','百萬','十億'];
+  const UV=['','1,000','1,000,000','1,000,000,000'],ID=['','1001−1','1001×999+1','1001×999001−1'];
   for(let e=s.length,i=0;e>0;e-=3,i++){const t=s.slice(Math.max(0,e-3),e);G.push({t,v:+t,i,pos:i%2===0})}
   const L=[...G].reverse();
   const ps=G.filter(g=>g.pos).reduce((a,g)=>a+g.v,0),ms=G.filter(g=>!g.pos).reduce((a,g)=>a+g.v,0),Sd=ps-ms,A1=Math.abs(Sd);
@@ -450,64 +567,77 @@ function b7(n,vin){
   const C7=g=>`<b class="${g.pos?'bl':'pk'}">${g.v}</b>`;
   const top=h('div','r7'),pcs=h('div','pcs');
   L.forEach((g,j)=>{if(j)pcs.append(h('div','comma',','));const w=h('div','pcw');g.card=h('div','pcn '+(g.pos?'pos':'neg'),g.t);
-    w.append(h('div','pcl',`第${g.i+1}節・${UN[g.i]}`),g.card,h('div','sg7 '+(g.pos?'pos':'neg'),g.pos?'＋':'−'));pcs.append(w)});
+    w.append(h('div','pcl',en?`Block ${g.i+1} · ${UN[g.i]}`:`第${g.i+1}節・${UN[g.i]}`),g.card,h('div','sg7 '+(g.pos?'pos':'neg'),g.pos?'＋':'−'));pcs.append(w)});
   const why=h('div','why'),wr=h('div','wrow');wr.append(cube('hole',4,true),h('div','n7l','1000 = <b>1001</b> − 1'));
-  why.append(wr,h('div','n7l','1001 = 7 × 143（7 份，每份 11×13 = 143）'));why.insertAdjacentHTML('beforeend',svg1001());
+  why.append(wr,h('div','n7l',en?'1001 = 7 × 143 (7 parts of 11×13 = 143 each)':'1001 = 7 × 143（7 份，每份 11×13 = 143）'));why.insertAdjacentHTML('beforeend',svg1001());
   top.append(pcs,why);
   function tray7(list,title,cls,sum){const T=tray(title,cls);if(!list.length)T.b.append(h('div','zero','0'));
     list.forEach((g,j)=>{if(j)T.b.append(h('span','op','＋'));g.slot=h('div','bd gh '+(g.pos?'pos':'neg'),g.t);T.b.append(g.slot)});
     T.t.append(h('div','bsum','= '+sum));return T}
-  const oddN=G.filter(g=>g.pos).map(g=>g.i+1).join('、'),evN=G.filter(g=>!g.pos).map(g=>g.i+1).join('、')||'2';
-  const P=tray7(L.filter(g=>g.pos),`＋ 奇數節（第${oddN}節）`,'pl1',ps),M=tray7(L.filter(g=>!g.pos),`− 偶數節（第${evN}節）`,'mi1',ms);
+  const oddN=G.filter(g=>g.pos).map(g=>g.i+1).join(en?', ':'、'),evN=G.filter(g=>!g.pos).map(g=>g.i+1).join(en?', ':'、')||'2';
+  const P=tray7(L.filter(g=>g.pos),en?`＋ Odd blocks (Block ${oddN})`:`＋ 奇數節（第${oddN}節）`,'pl1',ps),M=tray7(L.filter(g=>!g.pos),en?`− Even blocks (Block ${evN})`:`− 偶數節（第${evN}節）`,'mi1',ms);
   const trays=h('div','trays');trays.append(P.t,M.t);
-  const reEl=h('div','re7',re?`${A1.toLocaleString('en-US')} 還有四位 → 再分一次節：<span class="bl">${String(re.lo).padStart(3,'0')}</span> − <span class="pk">${re.hi}</span> = ${re.d2}`:'');
-  const g7=h('div','g7');g7.append(h('div','n7l',fin?`${fin} 個：每 7 個一直條${fin>=70?'（每 10 條＝70 個併成一大片）':''}`:'差是 0'));if(fin)g7.insertAdjacentHTML('beforeend',svg7(fin));
-  const vd=h('div','vd '+(ok?'ok':'no'),`${fin} ${ok?'是':'不是'} 7 的倍數 → ${N.toLocaleString('en-US')} ${ok?'是':'不是'} 7 的倍數 ${ok?'✓':'✗'}`);
+  const reEl=h('div','re7',re?(en?`${A1.toLocaleString('en-US')} has 4 digits → split again: <span class="bl">${String(re.lo).padStart(3,'0')}</span> − <span class="pk">${re.hi}</span> = ${re.d2}`:`${A1.toLocaleString('en-US')} 還有四位 → 再分一次節：<span class="bl">${String(re.lo).padStart(3,'0')}</span> − <span class="pk">${re.hi}</span> = ${re.d2}`):'');
+  const g7=h('div','g7');g7.append(h('div','n7l',fin?(en?`${fin} blocks: columns of 7${fin>=70?' (10 columns = 70 in a slab)':''}`:`${fin} 個：每 7 個一直條${fin>=70?'（每 10 條＝70 個併成一大片）':''}`):(en?'Difference is 0':'差是 0')));if(fin)g7.insertAdjacentHTML('beforeend',svg7(fin));
+  const vd=h('div','vd '+(ok?'ok':'no'),en
+    ?`${fin} is ${ok?'':'not '}a multiple of 7 → ${N.toLocaleString('en-US')} is ${ok?'':'not '}divisible by 7 ${ok?'✓':'✗'}`
+    :`${fin} ${ok?'是':'不是'} 7 的倍數 → ${N.toLocaleString('en-US')} ${ok?'是':'不是'} 7 的倍數 ${ok?'✓':'✗'}`);
   vin.append(top,trays,reEl,g7,vd);
   const idRows=['1001 = 7 × 11 × 13','1,000 = 1001 − 1'];
   if(G.length>=3)idRows.push('1,000,000 = 1001×999 + 1');
   if(G.length>=4)idRows.push('1,000,000,000 = 1001×999001 − 1');
-  const st=[{cap:`從個位往左，每三位數分成一節（就是千分位的逗號），共 ${G.length} 節`,rows:[`${N} → <b>${L.map(g=>g.t).join(',')}</b>`]},
-    {cap:'關鍵：1001 = 7×11×13，1000 = 1001 − 1。每往左一節就再乘 1000，正負號就翻一次（＋ − ＋ −）',rows:idRows,go:async()=>why.classList.add('show')}];
+  const st=[{cap:en?`Group digits by 3 from right to left (like thousands commas), ${G.length} blocks total`:`從個位往左，每三位數分成一節（就是千分位的逗號），共 ${G.length} 節`,rows:[`${N} → <b>${L.map(g=>g.t).join(',')}</b>`]},
+    {cap:en?'Key: 1001 = 7×11×13, 1000 = 1001 − 1. Each block to the left multiplies by 1000, alternating signs (+ − + −)':'關鍵：1001 = 7×11×13，1000 = 1001 − 1。每往左一節就再乘 1000，正負號就翻一次（＋ − ＋ −）',rows:idRows,go:async()=>why.classList.add('show')}];
   if(G.length>1){
     const t1=L.map(g=>g.i===0?C7(g):`${C7(g)}×${UV[g.i]}`).join(' + ');
     const t2=L.map(g=>g.i===0?C7(g):`${C7(g)}×(${ID[g.i]})`).join(' + ');
     const pe=L.filter(g=>g.pos).map(C7).join(' + '),me=L.filter(g=>!g.pos).map(C7).join(' + ');
-    st.push({cap:'從右邊起：第 1 節「＋」、第 2 節「−」、第 3 節「＋」、第 4 節「−」，一加一減交替',rows:[`${N} = ${t1}`,`= ${t2}`],go:async()=>vin.classList.add('s2')});
-    st.push({cap:'1001 的倍數一定是 7 的倍數，不用管；＋節放進＋區，−節放進−區',rows:[`= <span class="ug">1001 的倍數</span> + (${pe}) − (${me})`],go:async a=>{await move(L.map(g=>g.card),L.map(g=>g.slot),a)}});
-    st.push({cap:`＋區合計 ${ps}，−區合計 ${ms}，相減得 ${Sd}${Sd<0?`（負數沒關係，看 ${A1}）`:''}`,rows:[`${ps} − ${ms} = ${Sd}`],go:async()=>vin.classList.add('s4')});
-  }else st.push({cap:`${N} 只有一節，直接判斷`,rows:[`${N} 只有一節`],go:async a=>{vin.classList.add('s2');await move(L.map(g=>g.card),L.map(g=>g.slot),a);vin.classList.add('s4')}});
-  if(re)st.push({cap:`差 ${A1} 還是四位數 → 對它再用一次三位分節法`,rows:[`${A1} → ${re.hi},${String(re.lo).padStart(3,'0')}`,`${re.lo} − ${re.hi} = ${re.d2}`],go:async()=>vin.classList.add('s45')});
+    st.push({cap:en?'From the right: Block 1 "+", Block 2 "−", Block 3 "+", Block 4 "−", alternating signs':'從右邊起：第 1 節「＋」、第 2 節「−」、第 3 節「＋」、第 4 節「−」，一加一減交替',rows:[`${N} = ${t1}`,`= ${t2}`],go:async()=>vin.classList.add('s2')});
+    st.push({cap:en?'Multiples of 1001 are multiples of 7 (ignore them); place + blocks in + box, − blocks in − box':'1001 的倍數一定是 7 的倍數，不用管；＋節放進＋區，−節放進−區',rows:[`= <span class="ug">${en?'Multiples of 1001':'1001 的倍數'}</span> + (${pe}) − (${me})`],go:async a=>{await move(L.map(g=>g.card),L.map(g=>g.slot),a)}});
+    st.push({cap:en?`+ box sum ${ps}, − box sum ${ms}, difference is ${Sd}${Sd<0?` (negative is fine, take |diff| = ${A1})`:''}`:`＋區合計 ${ps}，−區合計 ${ms}，相減得 ${Sd}${Sd<0?`（負數沒關係，看 ${A1}）`:''}`,rows:[`${ps} − ${ms} = ${Sd}`],go:async()=>vin.classList.add('s4')});
+  }else st.push({cap:en?`${N} has only 1 block, evaluate directly`:`${N} 只有一節，直接判斷`,rows:[en?`${N} has only 1 block`:`${N} 只有一節`],go:async a=>{vin.classList.add('s2');await move(L.map(g=>g.card),L.map(g=>g.slot),a);vin.classList.add('s4')}});
+  if(re)st.push({cap:en?`Difference ${A1} still has 4 digits → apply 3-digit block method again`:`差 ${A1} 還是四位數 → 對它再用一次三位分節法`,rows:[`${A1} → ${re.hi},${String(re.lo).padStart(3,'0')}`,`${re.lo} − ${re.hi} = ${re.d2}`],go:async()=>vin.classList.add('s45')});
   const sameR=N%7===r;
-  st.push({cap:`${fin} 個每 7 個一組 → ${q} 組，剩 ${r} 個${sameR&&G.length>1?`（原數除以 7 也餘 ${r}）`:''}`,rows:[`${fin} = 7×${q}${r?' + '+r:''}`],go:async()=>vin.classList.add('s5')});
-  st.push({cap:`${N.toLocaleString('en-US')} ${ok?'是':'不是'} 7 的倍數 ${ok?'✓':'✗'}　💡 1001 = 7×11×13，同一個差也能判斷 11 和 13！`,rows:[`<span class="${ok?'okc':'noc'}">${N} ${ok?'是':'不是'} 7 的倍數 ${ok?'✓':'✗'}</span>`,`加碼：${A1} ${A1%11?'不是':'是'} 11 的倍數、${A1%13?'不是':'是'} 13 的倍數 → 原數也一樣`],go:async()=>vd.classList.add('show')});
+  st.push({cap:en?`${fin} blocks grouped into 7s → ${q} groups, ${r} remaining${sameR&&G.length>1?` (original number mod 7 is also ${r})`:''}`:`${fin} 個每 7 個一組 → ${q} 組，剩 ${r} 個${sameR&&G.length>1?`（原數除以 7 也餘 ${r}）`:''}`,rows:[`${fin} = 7×${q}${r?' + '+r:''}`],go:async()=>vin.classList.add('s5')});
+  st.push({cap:en?`${N.toLocaleString('en-US')} is ${ok?'':'not '}divisible by 7 ${ok?'✓':'✗'} 💡 1001 = 7×11×13, this difference also checks 11 and 13!`:`${N.toLocaleString('en-US')} ${ok?'是':'不是'} 7 的倍數 ${ok?'✓':'✗'}　💡 1001 = 7×11×13，同一個差也能判斷 11 和 13！`,rows:[en?`<span class="${ok?'okc':'noc'}">${N} is ${ok?'':'not '}divisible by 7 ${ok?'✓':'✗'}</span>`:`<span class="${ok?'okc':'noc'}">${N} ${ok?'是':'不是'} 7 的倍數 ${ok?'✓':'✗'}</span>`,en?`Bonus: ${A1} is ${A1%11?'not ':''}divisible by 11, and ${A1%13?'not ':''}divisible by 13 → same for original number`:`加碼：${A1} ${A1%11?'不是':'是'} 11 的倍數、${A1%13?'不是':'是'} 13 的倍數 → 原數也一樣`],go:async()=>vd.classList.add('show')});
   return{steps:st};
 }
 
 /* ===== 規則設定 ===== */
 const ORDER=['2','4','8','3','9','11','7'];
 const RULES={
-  '2':{p:['2136','123457','1350'],max:6,rule:'<b>2 的倍數：</b>個位是 0、2、4、6、8（偶數），就是 2 的倍數。',b:bTail(2)},
-  '4':{p:['7528','123456','1350'],max:6,rule:'<b>4 的倍數：</b>末兩位數是 4 的倍數，這個數就是 4 的倍數。',b:bTail(4)},
-  '8':{p:['7528','123456','3100'],max:6,rule:'<b>8 的倍數：</b>末三位數是 8 的倍數，這個數就是 8 的倍數。',b:bTail(8)},
-  '3':{p:['2136','123456','1234'],max:6,rule:'<b>3 的倍數：</b>各位數字和是 3 的倍數，這個數就是 3 的倍數。',b:b39(3)},
-  '9':{p:['1233','123453','2136'],max:6,rule:'<b>9 的倍數：</b>各位數字和是 9 的倍數，這個數就是 9 的倍數。',b:b39(9)},
-  '11':{p:['9724','123321','2345'],max:6,rule:'<b>11 的倍數：</b>「奇數位數字和」與「偶數位數字和」的差是 11 的倍數或 0。',b:b11},
-  '7':{p:['366415','864197523','123456789012','999999999999'],max:12,rule:'<b>7 的倍數（補充・三位分節法）：</b>從個位起每三位一節，「第1、3節和 − 第2、4節和」是 7 的倍數或 0，原數就是 7 的倍數。（最多 12 位）',b:b7}
+  '2':{p:['2136','123457','1350'],max:6,b:bTail(2)},
+  '4':{p:['7528','123456','1350'],max:6,b:bTail(4)},
+  '8':{p:['7528','123456','3100'],max:6,b:bTail(8)},
+  '3':{p:['2136','123456','1234'],max:6,b:b39(3)},
+  '9':{p:['1233','123453','2136'],max:6,b:b39(9)},
+  '11':{p:['9724','123321','2345'],max:6,b:b11},
+  '7':{p:['366415','864197523','123456789012','999999999999'],max:12,b:b7}
 };
 
 /* ===== 放大鏡（雙指縮放、拖曳、雙擊放大） ===== */
-function Zoomer(panel,zw,lay,layLabel){
+function Zoomer(panel,zw,lay,layLabelKey){
   let z=1,tx=0,ty=0;
   const zc=panel.querySelector('.zc');
-  zc.innerHTML='<button data-a="out" title="縮小">−</button><button data-a="pct" title="還原 100%">100%</button><button data-a="in" title="放大">＋</button><button data-a="lay" class="lay"></button>';
-  const pct=zc.querySelector('[data-a=pct]'),layB=zc.querySelector('.lay');
+  zc.innerHTML='<button data-a="out">−</button><button data-a="pct">100%</button><button data-a="in">＋</button><button data-a="lay" class="lay"></button>';
+  const pct=zc.querySelector('[data-a=pct]'),layB=zc.querySelector('.lay'),outB=zc.querySelector('[data-a=out]'),inB=zc.querySelector('[data-a=in]');
+  function updateTitles(){
+    const t=I18N[S.lang];
+    outB.title=t.zoomOut;inB.title=t.zoomIn;pct.title=t.zoomReset;
+    api.setLay(S.layout===lay);
+  }
   function clamp(){const cw=zw.offsetWidth,ch=zw.offsetHeight;tx=Math.min(0,Math.max(cw-cw*z,tx));ty=Math.min(0,Math.max(ch-ch*z,ty))}
   function apply(){clamp();zw.style.transform=z>1.001?`translate(${tx}px,${ty}px) scale(${z})`:'';pct.textContent=Math.round(z*100)+'%';panel.classList.toggle('zoomed',z>1.001)}
   function loc(cx,cy){const r=panel.getBoundingClientRect();return[cx-r.left-zw.offsetLeft,cy-r.top-zw.offsetTop]}
   function zoomAt(nz,cx,cy){nz=Math.max(1,Math.min(4,nz));const[px,py]=loc(cx,cy);tx=px-(px-tx)*nz/z;ty=py-(py-ty)*nz/z;z=nz;if(z<=1.001){z=1;tx=ty=0}apply()}
   function ctr(){const r=panel.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]}
-  const api={reset(){z=1;tx=ty=0;apply()},zoomBy(k){const[a,b]=ctr();zoomAt(z*k,a,b)},get z(){return z},setLay(on){layB.textContent=on?'↙ 還原':'⤢ '+layLabel}};
+  const api={
+    reset(){z=1;tx=ty=0;apply()},
+    zoomBy(k){const[a,b]=ctr();zoomAt(z*k,a,b)},
+    get z(){return z},
+    setLay(on){const t=I18N[S.lang];layB.textContent=on?t.layReset:'⤢ '+(layLabelKey==='vis'?t.layVis:t.layEq)},
+    updateTitles
+  };
   zc.addEventListener('click',e=>{const a=e.target.closest('button')?.dataset.a;if(a==='in')api.zoomBy(1.3);else if(a==='out')api.zoomBy(1/1.3);else if(a==='pct')api.reset();else if(a==='lay')setLayout(lay)});
   const P=new Map();let g=null,moved=false,pinched=false,sx=0,sy=0,last=0,lx=0,ly=0;
   const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -535,9 +665,15 @@ function Zoomer(panel,zw,lay,layLabel){
   api.setLay(false);return api;
 }
 
-/* ===== 引擎 ===== */
-const S={rule:'2',num:'2136',step:0,busy:false,playing:false,mode:'projector',layout:'both',zf:1};let cur=null;
-try{S.zf=+localStorage.getItem('dv-zf')||1;S.layout=localStorage.getItem('dv-lay')||'both'}catch(e){}
+/* ===== 狀態與引擎 ===== */
+const S={rule:'2',num:'2136',step:0,busy:false,playing:false,mode:'projector',layout:'both',zf:1,lang:'zh'};
+let cur=null;
+try{
+  S.zf=+localStorage.getItem('dv-zf')||1;
+  S.layout=localStorage.getItem('dv-lay')||'both';
+  S.lang=localStorage.getItem('dv-lang')||'zh';
+}catch(e){}
+
 function fit(){const V=$('#vis'),vin=$('#visz').firstChild;if(!vin)return;const H=V.clientHeight-16;if(H<=0)return;
   const ok=u=>{vin.style.setProperty('--u',u+'px');return vin.offsetHeight<=H&&vin.scrollWidth<=vin.clientWidth+1};
   let lo=2,hi=S.mode==='mobile'?22:(S.layout==='vis'?40:30);if(ok(hi))return;for(let i=0;i<11;i++){const m=(lo+hi)/2;ok(m)?lo=m:hi=m}ok(lo)}
@@ -545,8 +681,9 @@ function fitEq(){const E=$('#eq'),Z=$('#eqz'),avail=E.clientHeight-(S.mode==='mo
   let f=(S.mode==='mobile'?30:(S.layout==='eq'?90:58))*S.zf;Z.style.fontSize=f+'px';while(f>13&&Z.offsetHeight>avail){f-=2;Z.style.fontSize=f+'px'}}
 function rebuild(){document.querySelectorAll('.flyer').forEach(e=>e.remove());SMALL=S.num.length>=5;const V=$('#visz');V.innerHTML='';const vin=h('div','vin');V.append(vin);cur=RULES[S.rule].b(S.num,vin);S.step=0;fit()}
 function render(){const st=cur.steps[S.step];
-  $('#cap').innerHTML=`<span class="sn">步驟 ${S.step+1}/${cur.steps.length}</span><span>${st.cap}</span>`;
-  const E=$('#eqz');E.innerHTML='<div class="eqt">📝 算式推導</div>';
+  const t=I18N[S.lang];
+  $('#cap').innerHTML=`<span class="sn">${t.step} ${S.step+1}/${cur.steps.length}</span><span>${st.cap}</span>`;
+  const E=$('#eqz');E.innerHTML=`<div class="eqt">${t.derivation}</div>`;
   cur.steps.slice(0,S.step+1).forEach((s,i)=>(s.rows||[]).forEach(r=>E.append(h('div','row '+(i===S.step?'cur':'old'),r))));
   fitEq();
   const d=$('#dots');d.innerHTML='';cur.steps.forEach((_,i)=>{const x=h('span','dot'+(i<=S.step?' on':'')+(i===S.step?' cur':''));x.onclick=()=>{stop();goto(i)};d.append(x)});
@@ -557,21 +694,58 @@ async function jumpTo(t){const app=$('#app');app.classList.add('noanim');rebuild
 async function goto(t){if(S.busy||!cur)return;t=Math.max(0,Math.min(cur.steps.length-1,t));if(t===S.step)return;
   if(t===S.step+1){S.busy=true;S.step=t;render();try{cur.steps[t].go&&await cur.steps[t].go(true)}finally{S.busy=false}}
   else await jumpTo(t)}
-function stop(){S.playing=false;$('#play').classList.remove('on');$('#play').textContent='▶ 播放'}
+function stop(){S.playing=false;$('#play').classList.remove('on');$('#play').textContent=I18N[S.lang].play}
 async function play(){if(S.playing){stop();return}if(S.step===cur.steps.length-1)await jumpTo(0);
-  S.playing=true;$('#play').classList.add('on');$('#play').textContent='⏸ 暫停';
+  S.playing=true;$('#play').classList.add('on');$('#play').textContent=I18N[S.lang].pause;
   while(S.playing&&S.step<cur.steps.length-1){await sleep(S.step===0?1500:2800);if(!S.playing)break;await goto(S.step+1)}stop()}
 function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',3500)}
 function resetZoom(){VZ.reset();EZ.reset()}
 function refresh(){setTimeout(()=>{syncH();if(cur){stop();jumpTo(S.step)}},40)}
+
+function updateStaticUI(){
+  const t=I18N[S.lang];
+  document.documentElement.lang=S.lang==='en'?'en':'zh-Hant';
+  $('#doc-title').textContent=t.title;
+  $('#doc-desc').content=t.desc;
+  $('#brand-link').textContent=t.brand;
+  $('#lang-btn').textContent=t.langBtn;
+  $('#lang-btn').title=t.langTitle;
+  $('#zfm').title=t.zfmTitle;
+  $('#zfp').title=t.zfpTitle;
+  $('#btn-projector').textContent=t.projector;
+  $('#btn-mobile').textContent=t.mobile;
+  $('#fs').textContent=t.fs;
+  $('#num').setAttribute('aria-label',t.inputAria);
+  $('#start').textContent=t.demo;
+  $('#rand').title=t.randTitle;
+  $('#prev').textContent=t.prev;
+  $('#next').textContent=t.next;
+  $('#play').textContent=S.playing?t.pause:t.play;
+  $('#kbd-hint').textContent=t.kbd;
+  document.querySelectorAll('.tabs button').forEach(b=>{
+    if(b.dataset.r==='7')b.innerHTML=t.tab7;
+  });
+  VZ.updateTitles();
+  EZ.updateTitles();
+}
+
+function setLang(lang){
+  S.lang=lang;
+  try{localStorage.setItem('dv-lang',lang)}catch(e){}
+  updateStaticUI();
+  $('#rule').innerHTML=I18N[S.lang].rules[S.rule];
+  stop();resetZoom();
+  jumpTo(S.step);
+}
+
 function setRule(r){S.rule=r;stop();resetZoom();
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.r===r));
   const inp=$('#num');inp.maxLength=RULES[r].max;inp.classList.toggle('long',RULES[r].max>6);
-  $('#rule').innerHTML=RULES[r].rule;const p=$('#presets');p.innerHTML='';
+  $('#rule').innerHTML=I18N[S.lang].rules[r];const p=$('#presets');p.innerHTML='';
   RULES[r].p.forEach(v=>{const b=h('button','chip',v);b.onclick=()=>{$('#num').value=v;start()};p.append(b)});
   S.num=RULES[r].p[0];inp.value=S.num;jumpTo(0)}
 function start(){const v=$('#num').value.trim().replace(/[,，\s]/g,''),mx=RULES[S.rule].max;
-  if(!new RegExp(`^[1-9]\\d{0,${mx-1}}$`).test(v)){toast(`請輸入 1～${'9'.repeat(mx)} 的整數（最多 ${mx} 位數）`);return}
+  if(!new RegExp(`^[1-9]\\d{0,${mx-1}}$`).test(v)){toast(I18N[S.lang].valError(mx));return}
   S.num=v;$('#num').value=v;stop();resetZoom();$('#num').blur();jumpTo(0)}
 function random(){const k=+S.rule,mx=RULES[S.rule].max,mn=mx>6?6:4,len=mn+Math.floor(Math.random()*(mx-mn+1)),lo=10**(len-1);
   let x=lo+Math.floor(Math.random()*9*lo);
@@ -586,14 +760,15 @@ function syncH(){$('#app').style.height=Math.round(innerHeight)+'px'}
 async function fullscreen(){const el=document.documentElement;
   try{if(document.fullscreenElement||document.webkitFullscreenElement){(document.exitFullscreen||document.webkitExitFullscreen).call(document);return}
     if(el.requestFullscreen)await el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();else throw 0}
-  catch(e){toast('此環境不支援全螢幕：請另存成 .html 用 Safari 開啟，或「加入主畫面」後開啟（版面仍固定一頁）')}}
+  catch(e){toast(I18N[S.lang].fsNotSupported)}}
 
-const VZ=Zoomer($('#vis'),$('#visz'),'vis','大圖'),EZ=Zoomer($('#eq'),$('#eqz'),'eq','大算式');
-ORDER.forEach(r=>{const b=h('button',null,r==='7'?'7<small>補充</small>':r);b.dataset.r=r;b.onclick=()=>setRule(r);$('#tabs').append(b)});
+const VZ=Zoomer($('#vis'),$('#visz'),'vis','vis'),EZ=Zoomer($('#eq'),$('#eqz'),'eq','eq');
+ORDER.forEach(r=>{const b=h('button',null,r==='7'?I18N[S.lang].tab7:r);b.dataset.r=r;b.onclick=()=>setRule(r);$('#tabs').append(b)});
 document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
 $('#prev').onclick=()=>{stop();goto(S.step-1)};$('#next').onclick=()=>{stop();goto(S.step+1)};$('#play').onclick=play;
 $('#start').onclick=start;$('#rand').onclick=random;$('#fs').onclick=fullscreen;
 $('#zfm').onclick=()=>setZF(-.1);$('#zfp').onclick=()=>setZF(.1);
+$('#lang-btn').onclick=()=>setLang(S.lang==='zh'?'en':'zh');
 $('#num').addEventListener('keydown',e=>{if(e.key==='Enter')start()});
 document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const k=e.key;
   if(['ArrowRight','PageDown',' ','Enter','ArrowDown'].includes(k)){e.preventDefault();stop();goto(S.step+1)}
@@ -607,12 +782,15 @@ let rt;function onResize(){syncH();clearTimeout(rt);rt=setTimeout(()=>{if(!S.bus
 addEventListener('resize',onResize);
 document.addEventListener('fullscreenchange',onResize);document.addEventListener('webkitfullscreenchange',onResize);
 
-/* 解析 URL 參數（方便直接分享特定規則與數字） */
+/* 解析 URL 參數（支援直接設定語言、規則與數值） */
 const params=new URLSearchParams(location.search);
+const pLang=params.get('lang')||params.get('l');
 const pRule=params.get('r')||params.get('rule');
 const pNum=params.get('n')||params.get('num');
 const pMode=params.get('m')||params.get('mode');
 const hs=location.hash.slice(1);
+
+if(pLang==='en'||pLang==='zh')S.lang=pLang;
 
 S.mode=pMode==='mobile'||hs==='mobile'?'mobile':pMode==='projector'||hs==='projector'?'projector':(innerWidth<700?'mobile':'projector');
 document.body.className=S.mode;
@@ -621,6 +799,7 @@ document.documentElement.style.setProperty('--zf',S.zf);
 $('#zfv').textContent=Math.round(S.zf*100)+'%';
 applyLayout();
 syncH();
+updateStaticUI();
 
 const targetRule=(pRule&&RULES[pRule])?pRule:(hs&&RULES[hs])?hs:'2';
 setRule(targetRule);
