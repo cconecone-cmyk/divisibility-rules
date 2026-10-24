@@ -5,6 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 [![Zero Dependency](https://img.shields.io/badge/Dependencies-Zero-orange.svg?style=for-the-badge)](#)
 
+<p align="center">
+  <img src="divisibility_by_9.gif" alt="9 的倍數判別法幾何動畫演示 (Divisibility by 9 Animation)" width="760" style="max-width: 100%; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.15);" />
+</p>
+
 > 國中／國小數學《倍數判別法》幾何動態視覺化教學工具（支援**繁體中文**與**全英文**雙語切換）！  
 > 將抽象的十進位位值與代數拆解，轉換為生動的**幾何積木方塊分組**與**逐步算式推導動畫**，讓學生一眼看懂「為什麼倍數判別法會成立」。
 > 
